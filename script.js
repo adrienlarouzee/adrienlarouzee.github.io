@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 let player;
+let map;
+let markers = [];  // Pour stocker les marqueurs
 
 // Fonction appelée par l'API YouTube une fois chargée
 function onYouTubeIframeAPIReady() {
@@ -40,9 +42,6 @@ function onPlayerReady(event) {
     event.target.playVideo();  // Lecture automatique activée
 }
 
-let map;
-let markers = [];  // Pour stocker les marqueurs
-
 function initMap() {
     // Initialise la carte
     map = new google.maps.Map(document.getElementById("map"), {
@@ -62,7 +61,18 @@ function placeMarker(location) {
         map: map,
     });
     markers.push(marker);  // Ajouter le marqueur à la liste
+
+    // Remplacer "Titre de la chanson" et "Artiste" par des données réelles
+    const infoWindow = new google.maps.InfoWindow({
+        content: "Titre de la chanson: " + randomSong.title + "<br>Artiste: " + randomSong.artist
+    });
+
+    // Ajouter un événement pour ouvrir l'infobulle quand le marqueur est cliqué
+    marker.addListener("click", function() {
+        infoWindow.open(map, marker);
+    });
 }
+
 
 // Charge la carte après le chargement de la page
 window.onload = function() {
