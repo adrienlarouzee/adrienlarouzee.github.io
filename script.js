@@ -11,6 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
 let player;
 let map;
 let markers = [];  // Pour stocker les marqueurs
+let randomSong = {
+    title: "Never Gonna Give You Up",
+    artist: "Rick Astley"
+};
 
 // Fonction appelée par l'API YouTube une fois chargée
 function onYouTubeIframeAPIReady() {
