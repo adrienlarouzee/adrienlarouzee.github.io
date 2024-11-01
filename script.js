@@ -103,9 +103,12 @@ function checkEnableActionBtn() {
 
 // Chargement de la chanson pour la manche actuelle
 function loadRandomSong() {
-    const song = currentPlaylist[roundCounter];
-    randomSong = song;
-    loadHiddenYoutubePlayer(song.videoId);
+    if (roundCounter < maxRounds) { // Vérifie qu'il reste des manches
+        const song = currentPlaylist[roundCounter];
+        randomSong = song;
+        loadHiddenYoutubePlayer(song.videoId);
+        roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
+    }
 }
 
 // Affichage du résultat de la manche et mise à jour du score total
@@ -126,8 +129,6 @@ function displayResult(distance) {
     });
 
     roundCounter++;
-    roundInfo.innerText = `Round : ${roundCounter}/${maxRounds}`;
-
     if (roundCounter < maxRounds) {
         actionBtn.innerText = "Next Track";
         actionBtn.onclick = startNewRound;
