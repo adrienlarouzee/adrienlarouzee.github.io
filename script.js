@@ -16,7 +16,7 @@ function loadGoogleMaps() {
             resolve();
         } else {
             const script = document.createElement("script");
-            script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&async=1";
+            script.src = "https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=geometry,marker&async=1";
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject("Erreur de chargement de Google Maps");
@@ -52,34 +52,49 @@ function generateUniquePlaylist(data) {
     return playlist;
 }
 
-// Fonction de chargement de chanson YouTube pour la manche actuelle
+const playBtn = document.getElementById("playBtn"); // Bouton de lecture
+
+// Fonction de chargement du lecteur YouTube en mode caché pour la manche actuelle
+function loadHiddenYoutubePlayer(videoId) {
+    if (player) {
+        player.destroy(); // Supprime le lecteur précédent pour éviter les conflits
+    }
+    player = new YT.Player("hidden-youtube-player", {
+        height: "0",
+        width: "0",
+        videoId: videoId,
+        playerVars: { 
+            'enablejsapi': 1,
+            'modestbranding': 1,
+            'controls': 0,
+            'disablekb': 1,
+            'rel': 0,
+            'start': 60 // Démarre la vidéo à 60 secondes
+        },
+        events: { 
+            'onReady': function(event) {
+                // Masquer le bouton si autoplay fonctionne, sinon le rendre visible
+                playBtn.style.display = "block"; 
+                playBtn.onclick = function() {
+                    event.target.playVideo();
+                    playBtn.style.display = "none"; // Masquer le bouton après le démarrage
+                };
+            },
+            'onStateChange': function(event) {
+                // Afficher le bouton si la lecture est bloquée
+                if (event.data === YT.PlayerState.PAUSED) {
+                    playBtn.style.display = "block";
+                }
+            }
+        }
+    });
+}
+
+// Fonction pour charger la chanson pour la manche actuelle
 function loadRandomSong() {
     const song = currentPlaylist[roundCounter];
     randomSong = song;
-
-    if (player && typeof player.loadVideoById === "function") {
-        player.loadVideoById(song.videoId);
-    } else {
-        player = new YT.Player("youtube-player", {
-            height: "100%",
-            width: "100%",
-            videoId: song.videoId,
-            playerVars: { 
-                'enablejsapi': 1,
-                'modestbranding': 1,
-                'controls': 0,
-                'disablekb': 1,
-                'rel': 0
-            },
-            events: { 'onReady': onPlayerReady }
-        });
-    }
-}
-
-// Fonction appelée lorsque le lecteur YouTube est prêt
-function onPlayerReady(event) {
-    event.target.seekTo(60, true); // Démarre la vidéo à 60 secondes
-    event.target.playVideo();
+    loadHiddenYoutubePlayer(song.videoId);
 }
 
 // Fonction pour afficher le résultat de la manche et mettre à jour le score total
