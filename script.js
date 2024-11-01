@@ -97,7 +97,8 @@ function loadHiddenYoutubePlayer(videoId) {
     });
 }
 
-// Fonction pour charger la chanson pour la manche actuelle
+
+// Fonction de chargement de chanson pour la manche actuelle
 function loadRandomSong() {
     const song = currentPlaylist[roundCounter];
     randomSong = song;
@@ -132,6 +133,10 @@ function displayResult(distance) {
         actionBtn.innerText = "Morceau suivant";
         actionBtn.onclick = startNewRound;
     } else {
+        // Arrête la lecture à la fin de la 5e manche
+        if (player) {
+            player.stopVideo();
+        }
         totalScoreDisplay.innerHTML = `<strong style="color: red;">Score total : ${totalScore.toFixed(2)} km</strong>`;
         actionBtn.innerText = "Recommencer";
         actionBtn.onclick = resetGame;
@@ -194,6 +199,8 @@ function startNewRound() {
 function resetGame() {
     roundCounter = 0;
     scores = [];
+    hasPlayedOnce = false; // Réinitialiser hasPlayedOnce pour la nouvelle partie
+    playBtn.style.display = "none"; // Masquer le bouton au début du reset
     totalScoreDisplay.innerText = "Score total : 0 km";
     totalScoreDisplay.style.fontWeight = "normal";
     totalScoreDisplay.style.color = "black";
