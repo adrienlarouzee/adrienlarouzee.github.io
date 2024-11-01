@@ -5,17 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GeoMusic Guess</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Inclure Leaflet si nécessaire, sinon tu peux l'enlever -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=marker&loading=async&callback=initMap&libraries=geometry"></script>
+    
+    <!-- Script Google Maps avec les bonnes bibliothèques -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&callback=initMap"></script>
+    
+    <!-- Script pour l'API YouTube -->
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="script.js"></script>
+    
+    <!-- Script de ton code -->
+    <script src="script.js" defer></script>
 </head>
 <body>
     <h1>GeoMusic Guess</h1>
-    <div id="map"></div>
+    <div id="map" style="height: 500px;"></div> <!-- Ajoute une hauteur pour la carte -->
     <div id="player">
         <div id="youtube-player"></div>
     </div>
-  
 </body>
 </html>
