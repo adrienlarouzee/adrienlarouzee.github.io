@@ -10,8 +10,8 @@ const roundInfo = document.getElementById("round-info");
 const resultDisplay = document.getElementById("result");
 const totalScoreDisplay = document.getElementById("total-score");
 
-let hasPlayedOnce = false; // Pour suivre si la lecture a déjà été initiée
-let markerPlaced = false; // Pour suivre si un marqueur a été placé
+let hasPlayedOnce = false; // Indique si la lecture a déjà été initiée
+let markerPlaced = false; // Indique si un marqueur a été placé
 
 // Fonction pour charger Google Maps dynamiquement
 function loadGoogleMaps() {
@@ -50,13 +50,13 @@ function generateUniquePlaylist(data) {
     while (playlist.length < maxRounds) {
         const randomIndex = Math.floor(Math.random() * availableSongs.length);
         playlist.push(availableSongs[randomIndex]);
-        availableSongs.splice(randomIndex, 1);
+        availableSongs.splice(randomIndex, 1); // Supprime l'élément sélectionné pour éviter les doublons
     }
 
     return playlist;
 }
 
-// Chargement du lecteur YouTube caché
+// Chargement du lecteur YouTube caché pour le morceau actuel
 function loadHiddenYoutubePlayer(videoId) {
     if (player) player.destroy();
     
