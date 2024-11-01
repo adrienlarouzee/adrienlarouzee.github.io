@@ -89,7 +89,7 @@ function validateMarker(location) {
 
     const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
     const distance = google.maps.geometry.spherical.computeDistanceBetween(location, songLocation);
-    console.log("Distance au lieu d'origine : " + distance + " mètres");
+    console.log("Distance au lieu d'origine : " + (distance / 1000).toFixed(2) + " km");
 }
 
 // Charge la carte après le chargement de la page
