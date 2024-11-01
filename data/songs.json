@@ -3,18 +3,18 @@
         "title": "Never Gonna Give You Up",
         "artist": "Rick Astley",
         "videoId": "dQw4w9WgXcQ",
-        "location": { "lat": 51.5085, "lng": -0.1257 } // Coordonnées de Londres
-    },
-    {
-        "title": "Sweet Child O' Mine",
-        "artist": "Guns N' Roses",
-        "videoId": "1w7OgIMMRc4",
-        "location": { "lat": 34.0522, "lng": -118.2437 }
+        "location": {
+            "lat": 51.5085,  // Coordonnées de Londres
+            "lng": -0.1257
+        }
     },
     {
         "title": "Despacito",
         "artist": "Luis Fonsi",
         "videoId": "kJQP7kiw5Fk",
-        "location": { "lat": 18.4655, "lng": -66.1057 } // Coordonnées de Porto Rico
+        "location": {
+            "lat": 18.4655,  // Coordonnées de Porto Rico
+            "lng": -66.1057
+        }
     }
 ]
