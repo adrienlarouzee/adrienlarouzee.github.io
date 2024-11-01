@@ -90,15 +90,6 @@
         }
     },
     {
-        "title": "The Sound of Silence",
-        "artist": "Simon & Garfunkel",
-        "videoId": "4zLfCnGVeL4",
-        "location": {
-            "lat": 40.7128,
-            "lng": -74.0060
-        }
-    },
-    {
         "title": "Zum Zum",
         "artist": "Daddy Yankee",
         "videoId": "j0k7gzxkS3Y",
@@ -141,6 +132,141 @@
         "location": {
             "lat": 51.5085,
             "lng": -0.1257
+        }
+    },
+    {
+        "title": "Aicha",
+        "artist": "Khaled",
+        "videoId": "mrRPjzGeFQo",
+        "location": {
+            "lat": 36.7372,
+            "lng": 3.0866
+        }
+    },
+    {
+        "title": "Dragostea Din Tei",
+        "artist": "O-Zone",
+        "videoId": "jRx5PrAlUdY",
+        "location": {
+            "lat": 47.0105,
+            "lng": 28.8638
+        }
+    },
+    {
+        "title": "99 Luftballons",
+        "artist": "Nena",
+        "videoId": "La4Dcd1aUcE",
+        "location": {
+            "lat": 52.5200,
+            "lng": 13.4050
+        }
+    },
+    {
+        "title": "Macarena",
+        "artist": "Los Del Rio",
+        "videoId": "XiBYM6g8Tck",
+        "location": {
+            "lat": 37.3886,
+            "lng": -5.9823
+        }
+    },
+    {
+        "title": "Wavin' Flag",
+        "artist": "K'naan",
+        "videoId": "WTJSt4wP2ME",
+        "location": {
+            "lat": -0.0236,
+            "lng": 37.9062
+        }
+    },
+    {
+        "title": "Je te promets",
+        "artist": "Johnny Hallyday",
+        "videoId": "ImzpDHR1YNo",
+        "location": {
+            "lat": 48.8566,
+            "lng": 2.3522
+        }
+    },
+    {
+        "title": "Chop Suey!",
+        "artist": "System of a Down",
+        "videoId": "CSvFpBOe8eY",
+        "location": {
+            "lat": 34.0522,
+            "lng": -118.2437
+        }
+    },
+    {
+        "title": "Mundian To Bach Ke",
+        "artist": "Panjabi MC",
+        "videoId": "p2Suo8x1GKo",
+        "location": {
+            "lat": 30.7333,
+            "lng": 76.7794
+        }
+    },
+    {
+        "title": "Zombie",
+        "artist": "The Cranberries",
+        "videoId": "6Ejga4kJUts",
+        "location": {
+            "lat": 52.6638,
+            "lng": -8.6267
+        }
+    },
+    {
+        "title": "Mi Gente",
+        "artist": "J Balvin",
+        "videoId": "wnJ6LuUFpMo",
+        "location": {
+            "lat": 6.2442,
+            "lng": -75.5812
+        }
+    },
+    {
+        "title": "Djadja",
+        "artist": "Aya Nakamura",
+        "videoId": "xKQdwjGiF-s",
+        "location": {
+            "lat": 48.8534,
+            "lng": 2.3488
+        }
+    },
+    {
+        "title": "Sidi Mansour",
+        "artist": "Saber Rebaï",
+        "videoId": "rvzOjsr2wyo",
+        "location": {
+            "lat": 36.8065,
+            "lng": 10.1815
+        }
+    },
+    {
+        "title": "Baba Yetu",
+        "artist": "Christopher Tin",
+        "videoId": "IJiHDmyhE1A",
+        "location": {
+            "lat": -6.7924,
+            "lng": 39.2083
+        }
+    },
+    {
+        "title": "Vivir Mi Vida",
+        "artist": "Marc Anthony",
+        "videoId": "YXnjy5bYW6A",
+        "location": {
+            "lat": 18.4655,
+            "lng": -66.1057
+        }
+    },
+    {
+        "title": "Tunak Tunak Tun",
+        "artist": "Daler Mehndi",
+        "videoId": "vTIIMJ9tUc8",
+        "location": {
+            "lat": 28.6139,
+            "lng": 77.2090
         }
     }
 ]
