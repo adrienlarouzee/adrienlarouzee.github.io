@@ -37,13 +37,5 @@ function loadRandomSong() {
 
 function onPlayerReady(event) {
     console.log("Lecteur prêt");
-    // Supprime la lecture automatique si nécessaire pour Safari
-    // event.target.playVideo();
-}
-
-
-function playVideo() {
-    if (player && player.playVideo) {
-        player.playVideo();
-    }
+    event.target.playVideo();  // Active la lecture automatique
 }
