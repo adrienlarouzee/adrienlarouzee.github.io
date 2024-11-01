@@ -1,15 +1,18 @@
 let player, map, markers = [], randomSong = {};
 
-// Fonction pour charger Google Maps dynamiquement en utilisant une Promise
+// Fonction pour charger Google Maps dynamiquement avec async et vérification pour éviter les doublons
 function loadGoogleMaps() {
     return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker";
-        script.async = true;
-        script.defer = true;
-        script.onload = () => resolve(); // Résout la Promise quand le script est chargé
-        script.onerror = () => reject("Erreur de chargement de Google Maps");
-        document.head.appendChild(script);
+        if (typeof google !== "undefined" && google.maps) {
+            resolve(); // Si Google Maps est déjà chargé, on résout la promesse
+        } else {
+            const script = document.createElement("script");
+            script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&async=1";
+            script.async = true;
+            script.onload = () => resolve(); // Résout la Promise quand le script est chargé
+            script.onerror = () => reject("Erreur de chargement de Google Maps");
+            document.head.appendChild(script);
+        }
     });
 }
 
