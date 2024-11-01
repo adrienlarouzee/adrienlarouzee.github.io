@@ -55,8 +55,6 @@ function generateUniquePlaylist(data) {
 
     return playlist;
 }
-const playBtn = document.getElementById("playBtn"); // Bouton de lecture
-let hasPlayedOnce = false; // Variable pour savoir si la lecture a déjà été initiée une fois
 
 // Fonction de chargement du lecteur YouTube en mode caché pour la manche actuelle
 function loadHiddenYoutubePlayer(videoId) {
