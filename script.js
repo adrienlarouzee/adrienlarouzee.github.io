@@ -16,7 +16,7 @@ function loadGoogleMaps() {
             resolve();
         } else {
             const script = document.createElement("script");
-            script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&async=1";
+            script.src = "https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=geometry,marker&async=1";
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject("Erreur de chargement de Google Maps");
@@ -69,21 +69,16 @@ function loadRandomSong() {
                 'modestbranding': 1,
                 'controls': 0,
                 'disablekb': 1,
-                'showinfo': 0,
                 'rel': 0
             },
-            events: { 
-                'onReady': function(event) {
-                    event.target.seekTo(60, true); // Déplace la tête de lecture à 60 secondes
-                    event.target.playVideo(); // Démarre la vidéo à partir de 60 secondes
-                }
-            }
+            events: { 'onReady': onPlayerReady }
         });
     }
 }
 
 // Fonction appelée lorsque le lecteur YouTube est prêt
 function onPlayerReady(event) {
+    event.target.seekTo(60, true); // Démarre la vidéo à 60 secondes
     event.target.playVideo();
 }
 
@@ -181,10 +176,15 @@ function resetGame() {
     totalScoreDisplay.style.fontWeight = "normal";
     totalScoreDisplay.style.color = "black";
     roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
+
     fetch("data/songs.json")
         .then(response => response.json())
         .then(data => {
             currentPlaylist = generateUniquePlaylist(data); // Crée une nouvelle playlist pour la partie
+
+            // Affiche la playlist dans la console pour le debug
+            console.log("Playlist de la partie :", currentPlaylist);
+
             startNewRound();
         });
 }
@@ -203,6 +203,10 @@ Promise.all([
         .then(response => response.json())
         .then(data => {
             currentPlaylist = generateUniquePlaylist(data);
+
+            // Affiche la playlist dans la console pour le debug
+            console.log("Playlist de la partie :", currentPlaylist);
+
             loadRandomSong();
         });
 })
