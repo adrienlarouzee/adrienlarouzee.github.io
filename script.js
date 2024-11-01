@@ -2,21 +2,24 @@ let player, map, userMarker = null;
 let resultLine = null;
 let roundCounter = 0;
 let scores = [];
-let currentPlaylist = []; // Liste des 5 morceaux uniques pour la partie
+let currentPlaylist = [];
 const maxRounds = 5;
 const actionBtn = document.getElementById("actionBtn");
+const playBtn = document.getElementById("playBtn");
 const roundInfo = document.getElementById("round-info");
 const resultDisplay = document.getElementById("result");
 const totalScoreDisplay = document.getElementById("total-score");
 
-// Fonction pour charger Google Maps dynamiquement avec async et vérification pour éviter les doublons
+let hasPlayedOnce = false;
+
+// Charger Google Maps
 function loadGoogleMaps() {
     return new Promise((resolve, reject) => {
         if (typeof google !== "undefined" && google.maps) {
             resolve();
         } else {
             const script = document.createElement("script");
-            script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&async=1";
+            script.src = "https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=geometry,marker&async=1";
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject("Erreur de chargement de Google Maps");
@@ -25,7 +28,7 @@ function loadGoogleMaps() {
     });
 }
 
-// Fonction pour initialiser la carte Google Maps
+// Initialiser la carte Google Maps
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 20, lng: 0 },
@@ -33,33 +36,23 @@ function initMap() {
         mapId: 'MeloGuessrMap'
     });
 
-    map.addListener("click", function(event) { 
-        placeMarker(event.latLng);
-    });
+    map.addListener("click", (event) => placeMarker(event.latLng));
 }
 
-// Fonction pour sélectionner 5 morceaux uniques
+// Générer une playlist unique de morceaux
 function generateUniquePlaylist(data) {
     const playlist = [];
     const availableSongs = [...data];
-
     while (playlist.length < maxRounds) {
         const randomIndex = Math.floor(Math.random() * availableSongs.length);
-        playlist.push(availableSongs[randomIndex]);
-        availableSongs.splice(randomIndex, 1); // Supprime l'élément sélectionné pour éviter les doublons
+        playlist.push(availableSongs.splice(randomIndex, 1)[0]);
     }
-
     return playlist;
 }
 
-const playBtn = document.getElementById("playBtn"); // Bouton de lecture
-let hasPlayedOnce = false; // Variable pour savoir si la lecture a déjà été initiée une fois
-
-// Fonction de chargement du lecteur YouTube en mode caché pour la manche actuelle
+// Charger le lecteur YouTube pour le morceau actuel
 function loadHiddenYoutubePlayer(videoId) {
-    if (player) {
-        player.destroy(); // Supprime le lecteur précédent pour éviter les conflits
-    }
+    if (player) player.destroy();  // Supprime le lecteur précédent
     player = new YT.Player("hidden-youtube-player", {
         height: "0",
         width: "0",
@@ -70,53 +63,44 @@ function loadHiddenYoutubePlayer(videoId) {
             'controls': 0,
             'disablekb': 1,
             'rel': 0,
-            'start': 60 // Démarre la vidéo à 60 secondes
+            'start': 60
         },
         events: { 
-            'onReady': function(event) {
-                // Si la lecture a déjà été lancée une fois, démarre automatiquement sans bouton
+            'onReady': (event) => {
                 if (hasPlayedOnce) {
                     event.target.playVideo();
                 } else {
-                    // Affiche le bouton pour la première fois seulement si la lecture automatique est bloquée
                     playBtn.style.display = "block";
-                    playBtn.onclick = function() {
+                    playBtn.onclick = () => {
                         event.target.playVideo();
-                        playBtn.style.display = "none"; // Masque le bouton après le démarrage
-                        hasPlayedOnce = true; // Marque que la lecture a été initiée une fois
+                        playBtn.style.display = "none";
+                        hasPlayedOnce = true;
                     };
-                }
-            },
-            'onStateChange': function(event) {
-                // Affiche le bouton uniquement si la vidéo est en pause au début et que c'est le premier morceau
-                if (event.data === YT.PlayerState.PAUSED && !hasPlayedOnce) {
-                    playBtn.style.display = "block";
                 }
             }
         }
     });
 }
 
-// Fonction de chargement de chanson pour la manche actuelle
+// Charger un morceau pour la manche actuelle
 function loadRandomSong() {
     const song = currentPlaylist[roundCounter];
-    randomSong = song;
     loadHiddenYoutubePlayer(song.videoId);
 }
 
-// Fonction pour afficher le résultat de la manche et mettre à jour le score total
+// Afficher le résultat de la manche et le score total
 function displayResult(distance) {
     resultDisplay.innerText = `Score de la manche : ${distance.toFixed(2)} km`;
-    
     scores.push(distance);
 
     const totalScore = scores.reduce((acc, curr) => acc + curr, 0);
     totalScoreDisplay.innerText = `Score total : ${totalScore.toFixed(2)} km`;
 
+    // Tracer une ligne entre le marqueur et le lieu d'origine du morceau
     resultLine = new google.maps.Polyline({
         path: [
             userMarker.position,
-            { lat: randomSong.location.lat, lng: randomSong.location.lng }
+            { lat: currentPlaylist[roundCounter].location.lat, lng: currentPlaylist[roundCounter].location.lng }
         ],
         geodesic: true,
         strokeColor: "#FF0000",
@@ -126,101 +110,73 @@ function displayResult(distance) {
     });
 
     roundCounter++;
-    roundInfo.innerText = `Manche : ${roundCounter}/${maxRounds}`;
-
     if (roundCounter < maxRounds) {
         actionBtn.innerText = "Morceau suivant";
         actionBtn.onclick = startNewRound;
     } else {
-        // Arrête la lecture à la fin de la 5e manche
-        if (player) {
-            player.stopVideo();
-        }
+        if (player) player.stopVideo();
         totalScoreDisplay.innerHTML = `<strong style="color: red;">Score total : ${totalScore.toFixed(2)} km</strong>`;
         actionBtn.innerText = "Recommencer";
         actionBtn.onclick = resetGame;
     }
 }
 
-// Fonction pour placer un unique marqueur sur la carte
+// Placer un marqueur sur la carte
 function placeMarker(location) {
-    const pinIcon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+    if (userMarker) userMarker.setMap(null);
 
-    if (userMarker) {
-        userMarker.map = null;
-    }
-
-    const markerContent = document.createElement("img");
-    markerContent.src = pinIcon;
-    markerContent.style.width = "24px";
-    markerContent.style.height = "24px";
-
-    userMarker = new google.maps.marker.AdvancedMarkerElement({
+    userMarker = new google.maps.Marker({
         position: location,
-        map: map,
-        content: markerContent
+        map: map
     });
 }
 
-// Fonction pour valider la position du marqueur et calculer la distance
+// Valider la position du marqueur et calculer la distance
 function validateMarker() {
     if (!google.maps || !google.maps.geometry || !userMarker) {
         console.error("Google Maps non chargée ou marqueur non placé.");
         return;
     }
 
-    const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
-    const userLocation = new google.maps.LatLng(userMarker.position.lat, userMarker.position.lng);
+    const songLocation = new google.maps.LatLng(currentPlaylist[roundCounter].location.lat, currentPlaylist[roundCounter].location.lng);
+    const userLocation = new google.maps.LatLng(userMarker.position.lat(), userMarker.position.lng());
 
     const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, songLocation) / 1000;
     displayResult(distance);
 }
 
-// Fonction pour démarrer une nouvelle manche
+// Démarrer une nouvelle manche
 function startNewRound() {
     resultDisplay.innerText = "Score de la manche : ";
-    if (resultLine) {
-        resultLine.setMap(null);
-    }
-
-    if (userMarker) {
-        userMarker.map = null;
-        userMarker = null;
-    }
+    if (resultLine) resultLine.setMap(null);
+    if (userMarker) userMarker.setMap(null);
 
     loadRandomSong();
-
     actionBtn.innerText = "Valider";
     actionBtn.onclick = validateMarker;
 }
 
-// Fonction pour réinitialiser le jeu après les 5 manches
+// Réinitialiser le jeu après les 5 manches
 function resetGame() {
     roundCounter = 0;
     scores = [];
-    hasPlayedOnce = false; // Réinitialiser hasPlayedOnce pour la nouvelle partie
-    playBtn.style.display = "none"; // Masquer le bouton au début du reset
+    hasPlayedOnce = false;
+    playBtn.style.display = "none";
     totalScoreDisplay.innerText = "Score total : 0 km";
     totalScoreDisplay.style.fontWeight = "normal";
     totalScoreDisplay.style.color = "black";
     roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
 
     fetch("data/songs.json")
-        .then(response => response.json())
-        .then(data => {
-            currentPlaylist = generateUniquePlaylist(data); // Crée une nouvelle playlist pour la partie
-
-            // Affiche la playlist dans la console pour le debug
-            console.log("Playlist de la partie :", currentPlaylist);
-
+        .then((response) => response.json())
+        .then((data) => {
+            currentPlaylist = generateUniquePlaylist(data);
+            console.log("Nouvelle playlist :", currentPlaylist);  // Debug
             startNewRound();
         });
 }
 
-// Écouteur d'événement pour le bouton d'action
-actionBtn.onclick = validateMarker;
-
-// Initialisation de la partie et génération de la playlist unique
+// Initialisation de la partie et génération de la playlist
 Promise.all([
     new Promise(resolve => window.onYouTubeIframeAPIReady = resolve),
     loadGoogleMaps()
@@ -228,14 +184,14 @@ Promise.all([
 .then(() => {
     initMap();
     fetch("data/songs.json")
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
             currentPlaylist = generateUniquePlaylist(data);
-
-            // Affiche la playlist dans la console pour le debug
-            console.log("Playlist de la partie :", currentPlaylist);
-
+            console.log("Playlist initiale :", currentPlaylist);  // Debug
             loadRandomSong();
         });
 })
-.catch(error => console.error("Erreur de chargement des API :", error));
+.catch((error) => console.error("Erreur de chargement des API :", error));
+
+// Lien du bouton d'action à la fonction de validation
+actionBtn.onclick = validateMarker;
