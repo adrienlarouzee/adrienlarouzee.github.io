@@ -1,28 +1,24 @@
-// Déclaration globale d'initMap pour qu'elle soit accessible par Google Maps API
-window.initMap = function() {
-    // Initialise la carte Google Maps
+let player, map, markers = [], randomSong = {};
+
+// Fonction pour initialiser la carte Google Maps
+function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 20, lng: 0 },
         zoom: 2,
         mapId: 'MeloGuessrMap'
     });
 
-    // Ajoute un écouteur pour placer un marqueur lorsqu'on clique sur la carte
     map.addListener("click", function(event) { 
         placeMarker(event.latLng);
     });
-};
+}
 
-// Lorsque le DOM est chargé, vérifie si l'API Google Maps est prête puis initialise
-document.addEventListener("DOMContentLoaded", function () {
-    if (typeof google !== 'undefined' && google.maps) {
-        initMap(); // Appelle initMap si Google Maps est déjà chargé
-    }
-});
+// Fonction appelée automatiquement par l'API YouTube lorsqu'elle est prête
+function onYouTubeIframeAPIReady() {
+    loadRandomSong();
+}
 
-let player, map, markers = [], randomSong = {};
-
-// Fonction de chargement de chanson YouTube aléatoire
+// Fonction pour charger un morceau aléatoire depuis le fichier JSON
 function loadRandomSong() {
     fetch("data/songs.json")
         .then(response => response.json())
@@ -43,29 +39,28 @@ function loadRandomSong() {
         .catch(error => console.error("Erreur de chargement:", error));
 }
 
-function onYouTubeIframeAPIReady() {
-    loadRandomSong();
-}
-
+// Fonction appelée lorsque le lecteur YouTube est prêt
 function onPlayerReady(event) {
     event.target.playVideo();
 }
 
+// Fonction pour placer un marqueur sur la carte
 function placeMarker(location) {
     const markerContent = document.createElement("div");
     markerContent.style.cssText = "padding: 10px; background-color: white; border: 1px solid black; border-radius: 5px;";
     markerContent.innerHTML = "Marqueur placé";
-    
+
     const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
         content: markerContent
     });
-    
+
     markers.push(marker);
     validateMarker(location);
 }
 
+// Fonction pour valider la position du marqueur et calculer la distance par rapport au lieu d'origine de la chanson
 function validateMarker(location) {
     if (!google.maps || !google.maps.geometry) {
         console.error("Google Maps non chargée.");
@@ -75,7 +70,7 @@ function validateMarker(location) {
         console.error("Coordonnées non valides.");
         return;
     }
-    
+
     const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
     const distance = google.maps.geometry.spherical.computeDistanceBetween(location, songLocation);
     console.log("Distance au lieu d'origine : " + (distance / 1000).toFixed(2) + " km");
