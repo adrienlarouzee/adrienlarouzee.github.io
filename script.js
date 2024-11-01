@@ -1,5 +1,18 @@
 let player, map, markers = [], randomSong = {};
 
+// Fonction pour charger Google Maps dynamiquement en utilisant une Promise
+function loadGoogleMaps() {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker";
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve(); // Résout la Promise quand le script est chargé
+        script.onerror = () => reject("Erreur de chargement de Google Maps");
+        document.head.appendChild(script);
+    });
+}
+
 // Fonction pour initialiser la carte Google Maps
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
@@ -13,12 +26,7 @@ function initMap() {
     });
 }
 
-// Fonction appelée automatiquement par l'API YouTube lorsqu'elle est prête
-function onYouTubeIframeAPIReady() {
-    loadRandomSong();
-}
-
-// Fonction pour charger un morceau aléatoire depuis le fichier JSON
+// Fonction de chargement de chanson YouTube aléatoire
 function loadRandomSong() {
     fetch("data/songs.json")
         .then(response => response.json())
@@ -75,3 +83,14 @@ function validateMarker(location) {
     const distance = google.maps.geometry.spherical.computeDistanceBetween(location, songLocation);
     console.log("Distance au lieu d'origine : " + (distance / 1000).toFixed(2) + " km");
 }
+
+// Utilisation de Promises pour charger les deux API
+Promise.all([
+    new Promise(resolve => window.onYouTubeIframeAPIReady = resolve), // Promise pour l'API YouTube
+    loadGoogleMaps() // Promise pour Google Maps
+])
+.then(() => {
+    initMap(); // Initialise la carte après le chargement de Google Maps
+    loadRandomSong(); // Charge une chanson après le chargement de l’API YouTube
+})
+.catch(error => console.error("Erreur de chargement des API :", error));
