@@ -44,9 +44,13 @@ function onPlayerReady(event) {
     event.target.playVideo();  // Lecture automatique activée
 }
 
-
 function initMap() {
     // Initialise la carte Google Maps avec un ID de carte
+    if (typeof google === 'undefined' || !google.maps) {
+        console.error("L'API Google Maps n'est pas chargée.");
+        return;
+    }
+
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 20, lng: 0 },  // Position initiale
         zoom: 2,
@@ -103,8 +107,6 @@ function validateMarker(location) {
     // Affiche le résultat ou procède à la validation
     console.log("Distance au lieu d'origine : " + distance + " mètres");
 }
-
-
 
 // Charge la carte après le chargement de la page
 window.onload = function() {
