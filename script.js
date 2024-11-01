@@ -55,11 +55,14 @@ function generateUniquePlaylist(data) {
 
     return playlist;
 }
+const playBtn = document.getElementById("playBtn"); // Bouton de lecture
+let hasPlayedOnce = false; // Variable pour savoir si la lecture a déjà été initiée une fois
 
-// Chargement du lecteur YouTube caché pour le morceau actuel
+// Fonction de chargement du lecteur YouTube en mode caché pour la manche actuelle
 function loadHiddenYoutubePlayer(videoId) {
-    if (player) player.destroy();
-    
+    if (player) {
+        player.destroy(); // Supprime le lecteur précédent pour éviter les conflits
+    }
     player = new YT.Player("hidden-youtube-player", {
         height: "0",
         width: "0",
@@ -70,24 +73,25 @@ function loadHiddenYoutubePlayer(videoId) {
             'controls': 0,
             'disablekb': 1,
             'rel': 0,
-            'start': 60 
+            'start': 60 // Démarre la vidéo à 60 secondes
         },
         events: { 
             'onReady': function(event) {
+                // Si la lecture a déjà été lancée une fois, démarre automatiquement sans bouton
                 if (hasPlayedOnce) {
                     event.target.playVideo();
-                    checkEnableActionBtn();
                 } else {
+                    // Affiche le bouton pour la première fois seulement si la lecture automatique est bloquée
                     playBtn.style.display = "block";
                     playBtn.onclick = function() {
                         event.target.playVideo();
-                        playBtn.style.display = "none";
-                        hasPlayedOnce = true;
-                        checkEnableActionBtn();
+                        playBtn.style.display = "none"; // Masque le bouton après le démarrage
+                        hasPlayedOnce = true; // Marque que la lecture a été initiée une fois
                     };
                 }
             },
             'onStateChange': function(event) {
+                // Affiche le bouton uniquement si la vidéo est en pause au début et que c'est le premier morceau
                 if (event.data === YT.PlayerState.PAUSED && !hasPlayedOnce) {
                     playBtn.style.display = "block";
                 }
@@ -96,28 +100,27 @@ function loadHiddenYoutubePlayer(videoId) {
     });
 }
 
-// Activer le bouton "GUESS" seulement si la musique a démarré et un marqueur est placé
-function checkEnableActionBtn() {
-    actionBtn.style.display = hasPlayedOnce && markerPlaced ? "block" : "none";
-}
-
-// Chargement de la chanson pour la manche actuelle
-function loadCurrentSong() {
+// Fonction de chargement de chanson pour la manche actuelle
+function loadRandomSong() {
     const song = currentPlaylist[roundCounter];
+    randomSong = song;
     loadHiddenYoutubePlayer(song.videoId);
-    roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
 }
 
-// Affichage du résultat de la manche et mise à jour du score total
+// Fonction pour afficher le résultat de la manche et mettre à jour le score total
 function displayResult(distance) {
     resultDisplay.innerText = `Score de la manche : ${distance.toFixed(2)} km`;
     
     scores.push(distance);
+
     const totalScore = scores.reduce((acc, curr) => acc + curr, 0);
-    totalScoreDisplay.innerText = `Total Distance : ${totalScore.toFixed(2)} km`;
+    totalScoreDisplay.innerText = `Score total : ${totalScore.toFixed(2)} km`;
 
     resultLine = new google.maps.Polyline({
-        path: [userMarker.position, { lat: currentPlaylist[roundCounter].location.lat, lng: currentPlaylist[roundCounter].location.lng }],
+        path: [
+            userMarker.position,
+            { lat: randomSong.location.lat, lng: randomSong.location.lng }
+        ],
         geodesic: true,
         strokeColor: "#FF0000",
         strokeOpacity: 1.0,
@@ -126,16 +129,22 @@ function displayResult(distance) {
     });
 
     roundCounter++;
+    roundInfo.innerText = `Manche : ${roundCounter}/${maxRounds}`;
+
     if (roundCounter < maxRounds) {
-        actionBtn.innerText = "Next Track";
+        actionBtn.innerText = "Morceau suivant";
         actionBtn.onclick = startNewRound;
     } else {
-        if (player) player.stopVideo();
-        totalScoreDisplay.innerHTML = `<strong style="color: red;">Total Distance : ${totalScore.toFixed(2)} km</strong>`;
-        actionBtn.innerText = "RESTART";
+        // Arrête la lecture à la fin de la 5e manche
+        if (player) {
+            player.stopVideo();
+        }
+        totalScoreDisplay.innerHTML = `<strong style="color: red;">Score total : ${totalScore.toFixed(2)} km</strong>`;
+        actionBtn.innerText = "Recommencer";
         actionBtn.onclick = resetGame;
     }
 }
+
 
 // Placement d'un marqueur unique sur la carte
 function placeMarker(location) {
@@ -188,25 +197,25 @@ function startNewRound() {
     actionBtn.innerText = "GUESS"; // Remet le texte à "GUESS" pour chaque manche
 }
 
-// Réinitialiser le jeu après les 5 manches
+// Fonction pour réinitialiser le jeu après les 5 manches
 function resetGame() {
     roundCounter = 0;
     scores = [];
-    hasPlayedOnce = false;
-    markerPlaced = false;
-    playBtn.style.display = "none";
-    actionBtn.style.display = "none";
-    totalScoreDisplay.innerText = "Total Distance : 0 km";
+    hasPlayedOnce = false; // Réinitialiser hasPlayedOnce pour la nouvelle partie
+    playBtn.style.display = "none"; // Masquer le bouton au début du reset
+    totalScoreDisplay.innerText = "Score total : 0 km";
     totalScoreDisplay.style.fontWeight = "normal";
     totalScoreDisplay.style.color = "black";
-    roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
-    resultDisplay.innerText = "Distance : ";
+    roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
 
     fetch("data/songs.json")
         .then(response => response.json())
         .then(data => {
-            currentPlaylist = generateUniquePlaylist(data); // Crée une nouvelle playlist aléatoire
-            console.log("Playlist de la partie :", currentPlaylist); // Debug : affiche la playlist dans la console
+            currentPlaylist = generateUniquePlaylist(data); // Crée une nouvelle playlist pour la partie
+
+            // Affiche la playlist dans la console pour le debug
+            console.log("Playlist de la partie :", currentPlaylist);
+
             startNewRound();
         });
 }
