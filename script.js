@@ -100,10 +100,13 @@ function displayResult(distance) {
 
     if (roundCounter < maxRounds) {
         // Change le bouton pour passer à la manche suivante
-        actionBtn.innerText = "Nouvelle chanson";
+        actionBtn.innerText = "Morceau suivant";
         actionBtn.onclick = startNewRound;
     } else {
-        // Affiche le score final et change le bouton pour recommencer une partie
+        // Affiche le score final en gras et en rouge
+        totalScoreDisplay.innerHTML = `<strong style="color: red;">Score total : ${totalScore.toFixed(2)} km</strong>`;
+        
+        // Change le bouton pour recommencer une partie
         actionBtn.innerText = "Recommencer";
         actionBtn.onclick = resetGame;
     }
@@ -170,6 +173,8 @@ function resetGame() {
     roundCounter = 0;
     scores = [];
     totalScoreDisplay.innerText = "Score total : 0 km";
+    totalScoreDisplay.style.fontWeight = "normal"; // Réinitialiser le style du score total
+    totalScoreDisplay.style.color = "black"; // Remettre le texte en noir
     roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
     startNewRound();
 }
