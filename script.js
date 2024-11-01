@@ -1,98 +1,69 @@
-let player;
-let map;
-let markers = [];  // Pour stocker les marqueurs
-let randomSong = {}; // Définir comme objet vide au départ
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof google !== 'undefined') initMap();
+});
 
-// Fonction appelée par l'API YouTube une fois chargée
+let player, map, markers = [], randomSong = {};
+
 function onYouTubeIframeAPIReady() {
     loadRandomSong();
 }
 
-// Fonction pour charger un morceau aléatoire
 function loadRandomSong() {
     fetch("data/songs.json")
         .then(response => response.json())
         .then(data => {
-            randomSong = data[Math.floor(Math.random() * data.length)]; // Mettre à jour la variable globale
-            if (!randomSong.location || !randomSong.location.lat || !randomSong.location.lng) {
-                console.error("randomSong n'a pas la structure attendue :", randomSong);
+            randomSong = data[Math.floor(Math.random() * data.length)];
+            if (!randomSong.location) {
+                console.error("Coordonnées manquantes :", randomSong);
                 return;
             }
-            console.log("Morceau chargé :", randomSong.title);
             player = new YT.Player("youtube-player", {
                 height: "100%",
                 width: "100%",
                 videoId: randomSong.videoId,
-                playerVars: { 
-                    'enablejsapi': 1,
-                    'origin': 'https://adrienlarouzee.github.io' // Ajoute l'origine
-                },
-                events: {
-                    'onReady': onPlayerReady
-                }
+                playerVars: { 'enablejsapi': 1 },
+                events: { 'onReady': onPlayerReady }
             });
         })
-        .catch(error => console.error("Erreur lors du chargement des morceaux :", error));
+        .catch(error => console.error("Erreur de chargement:", error));
 }
 
 function onPlayerReady(event) {
-    console.log("Lecteur prêt");
-    event.target.playVideo();  // Lecture automatique activée
+    event.target.playVideo();
 }
 
 function initMap() {
-    // Initialise la carte Google Maps
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 20, lng: 0 },
         zoom: 2,
-        mapId: 'MeloGuessrMap',
+        mapId: 'MeloGuessrMap'
     });
-
-    // Événement de clic sur la carte
-    map.addListener("click", function(event) {
-        placeMarker(event.latLng);
-    });
+    map.addListener("click", function (event) { placeMarker(event.latLng); });
 }
 
 function placeMarker(location) {
-    // Créer un élément pour le marqueur
     const markerContent = document.createElement("div");
-    markerContent.style.padding = "10px";  
-    markerContent.style.backgroundColor = "white";  
-    markerContent.style.border = "1px solid black";  
-    markerContent.style.borderRadius = "5px";  
-    markerContent.innerHTML = "Marqueur placé";  
-
-    // Créer le marqueur avec AdvancedMarkerElement
+    markerContent.style.cssText = "padding: 10px; background-color: white; border: 1px solid black; border-radius: 5px;";
+    markerContent.innerHTML = "Marqueur placé";
     const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
-        content: markerContent,  
+        content: markerContent
     });
-
-    markers.push(marker);  
-
-    // Appeler validateMarker ici
+    markers.push(marker);
     validateMarker(location);
 }
 
 function validateMarker(location) {
-    if (typeof google === 'undefined' || !google.maps || !google.maps.geometry) {
-        console.error("L'API Google Maps n'est pas chargée correctement.");
+    if (!google.maps || !google.maps.geometry) {
+        console.error("Google Maps non chargée.");
         return;
     }
-
-    if (!randomSong.location || !randomSong.location.lat || !randomSong.location.lng) {
-        console.error("randomSong n'a pas de coordonnées valides.");
+    if (!randomSong.location) {
+        console.error("Coordonnées non valides.");
         return;
     }
-
     const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
     const distance = google.maps.geometry.spherical.computeDistanceBetween(location, songLocation);
     console.log("Distance au lieu d'origine : " + (distance / 1000).toFixed(2) + " km");
 }
-
-// Charge la carte après le chargement de la page
-window.onload = function() {
-    initMap(); 
-};
