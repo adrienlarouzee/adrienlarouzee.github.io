@@ -37,5 +37,5 @@ function loadRandomSong() {
 
 function onPlayerReady(event) {
     console.log("Lecteur prêt");
-    event.target.playVideo();  // Active la lecture automatique
+    event.target.playVideo();  // Lecture automatique activée
 }
