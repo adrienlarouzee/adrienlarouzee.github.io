@@ -56,10 +56,14 @@ function initMap() {
 }
 
 function placeMarker(location) {
+    // Créer un élément pour le marqueur
+    const markerContent = document.createElement("div");
+    markerContent.innerHTML = "Marqueur";  // Peut être vide ou un texte par défaut
+
     const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
-        content: document.createElement("div"),  // Élément DOM pour le marqueur
+        content: markerContent,  // Utiliser l'élément créé
     });
 
     // Assurer que randomSong est défini ici
@@ -77,7 +81,7 @@ function placeMarker(location) {
         const infoWindow = new google.maps.InfoWindow({
             content: infoContent,
         });
-        infoWindow.open(map, marker);
+        infoWindow.open(map, marker);  // Afficher l'infobulle
     });
 
     markers.push(marker);  // Ajouter le marqueur à la liste
