@@ -27,6 +27,10 @@ function loadRandomSong() {
                 height: "100%",
                 width: "100%",
                 videoId: randomSong.videoId,
+                playerVars: { 
+                    'enablejsapi': 1,
+                    'origin': 'https://adrienlarouzee.github.io' // Ajoute l'origine
+                },
                 events: {
                     'onReady': onPlayerReady
                 }
