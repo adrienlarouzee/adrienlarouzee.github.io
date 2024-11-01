@@ -14,6 +14,13 @@ function loadRandomSong() {
         .then(response => response.json())
         .then(data => {
             randomSong = data[Math.floor(Math.random() * data.length)]; // Mettre à jour la variable globale
+
+            // Vérification si randomSong a bien la structure attendue
+            if (!randomSong.location || !randomSong.location.lat || !randomSong.location.lng) {
+                console.error("randomSong n'a pas la structure attendue :", randomSong);
+                return;
+            }
+
             console.log("Morceau chargé :", randomSong.title);
 
             player = new YT.Player("youtube-player", {
@@ -70,17 +77,10 @@ function placeMarker(location) {
     validateMarker(location);
 }
 
-// Fonction pour valider le placement du marqueur
 function validateMarker(location) {
-    // Assure-toi que google.maps est bien défini
-    if (typeof google === 'undefined' || !google.maps) {
-        console.error("Google Maps n'est pas défini !");
-        return;
-    }
-
-    // Vérifie que randomSong a une location
-    if (!randomSong || !randomSong.location) {
-        console.error("randomSong n'est pas défini ou n'a pas de location !");
+    // Vérifie si google et google.maps sont définis
+    if (typeof google === 'undefined' || !google.maps || !google.maps.geometry) {
+        console.error("L'API Google Maps n'est pas chargée correctement.");
         return;
     }
 
@@ -93,6 +93,7 @@ function validateMarker(location) {
     // Affiche le résultat ou procède à la validation
     console.log("Distance au lieu d'origine : " + distance + " mètres");
 }
+
 
 
 // Charge la carte après le chargement de la page
