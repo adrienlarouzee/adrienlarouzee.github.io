@@ -12,19 +12,33 @@ let player;
 
 // Fonction appelée par l'API YouTube une fois chargée
 function onYouTubeIframeAPIReady() {
-    console.log("API YouTube chargée");
-    player = new YT.Player("youtube-player", {
-        height: "100%",
-        width: "100%",
-        videoId: "dQw4w9WgXcQ",
-        events: {
-            'onReady': onPlayerReady
-        }
-    });
+    loadRandomSong();
+}
+
+// Fonction pour charger un morceau aléatoire
+function loadRandomSong() {
+    fetch("data/songs.json")
+        .then(response => response.json())
+        .then(data => {
+            const randomSong = data[Math.floor(Math.random() * data.length)];
+            console.log("Morceau chargé :", randomSong.title);
+
+            player = new YT.Player("youtube-player", {
+                height: "100%",
+                width: "100%",
+                videoId: randomSong.videoId,
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        })
+        .catch(error => console.error("Erreur lors du chargement des morceaux :", error));
 }
 
 function onPlayerReady(event) {
     console.log("Lecteur prêt");
+    // Supprime la lecture automatique si nécessaire pour Safari
+    // event.target.playVideo();
 }
 
 function playVideo() {
