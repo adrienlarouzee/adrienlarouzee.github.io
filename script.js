@@ -25,5 +25,10 @@ function onYouTubeIframeAPIReady() {
 
 function onPlayerReady(event) {
     console.log("Lecteur prêt");
-    event.target.playVideo();
+}
+
+function playVideo() {
+    if (player && player.playVideo) {
+        player.playVideo();
+    }
 }
