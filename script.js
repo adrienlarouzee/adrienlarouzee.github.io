@@ -57,10 +57,16 @@ function onPlayerReady(event) {
 
 // Fonction pour placer un marqueur sur la carte
 function placeMarker(location) {
-    const markerContent = document.createElement("div");
-    markerContent.style.cssText = "padding: 10px; background-color: white; border: 1px solid black; border-radius: 5px;";
-    markerContent.innerHTML = "Marqueur placé";
+    // URL de l'image du pin classique Google Maps
+    const pinIcon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
 
+    // Crée l'élément pour le contenu du marqueur avec l'icône de pin classique
+    const markerContent = document.createElement("img");
+    markerContent.src = pinIcon;
+    markerContent.style.width = "24px"; // Ajustez la taille selon vos préférences
+    markerContent.style.height = "24px";
+
+    // Crée un marqueur avec AdvancedMarkerElement
     const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
