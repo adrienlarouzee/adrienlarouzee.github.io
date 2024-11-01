@@ -114,7 +114,7 @@ function displayResult(distance) {
     
     scores.push(distance);
     const totalScore = scores.reduce((acc, curr) => acc + curr, 0);
-    totalScoreDisplay.innerText = `Score total : ${totalScore.toFixed(2)} km`;
+    totalScoreDisplay.innerText = `Total Distance : ${totalScore.toFixed(2)} km`;
 
     resultLine = new google.maps.Polyline({
         path: [userMarker.position, { lat: randomSong.location.lat, lng: randomSong.location.lng }],
@@ -126,14 +126,14 @@ function displayResult(distance) {
     });
 
     roundCounter++;
-    roundInfo.innerText = `Manche : ${roundCounter}/${maxRounds}`;
+    roundInfo.innerText = `Round : ${roundCounter}/${maxRounds}`;
 
     if (roundCounter < maxRounds) {
-        actionBtn.innerText = "Morceau suivant";
+        actionBtn.innerText = "Next Track";
         actionBtn.onclick = startNewRound;
     } else {
         if (player) player.stopVideo();
-        totalScoreDisplay.innerHTML = `<strong style="color: red;">Score total : ${totalScore.toFixed(2)} km</strong>`;
+        totalScoreDisplay.innerHTML = `<strong style="color: red;">Total Distance : ${totalScore.toFixed(2)} km</strong>`;
         actionBtn.innerText = "RESTART";
         actionBtn.onclick = resetGame;
     }
@@ -176,7 +176,7 @@ function validateMarker() {
 
 // Démarrer une nouvelle manche
 function startNewRound() {
-    resultDisplay.innerText = "Score de la manche : ";
+    resultDisplay.innerText = "Distance : ";
     if (resultLine) resultLine.setMap(null);
 
     if (userMarker) {
