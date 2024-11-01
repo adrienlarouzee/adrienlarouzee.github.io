@@ -4,7 +4,7 @@
         "artist": "Rick Astley",
         "videoId": "dQw4w9WgXcQ",
         "location": {
-            "lat": 51.5085,  // Coordonnées de Londres
+            "lat": 51.5085,
             "lng": -0.1257
         }
     },
@@ -13,7 +13,7 @@
         "artist": "Luis Fonsi",
         "videoId": "kJQP7kiw5Fk",
         "location": {
-            "lat": 18.4655,  // Coordonnées de Porto Rico
+            "lat": 18.4655,
             "lng": -66.1057
         }
     }
