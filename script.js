@@ -4,6 +4,9 @@ let roundCounter = 0; // Compteur de manche
 let scores = []; // Tableau pour stocker les scores de chaque manche
 const maxRounds = 5; // Nombre de manches
 const actionBtn = document.getElementById("actionBtn");
+const roundInfo = document.getElementById("round-info"); // Affichage de la progression
+const resultDisplay = document.getElementById("result"); // Affichage du score de chaque manche
+const totalScoreDisplay = document.getElementById("total-score"); // Affichage du score total
 
 // Fonction pour charger Google Maps dynamiquement avec async et vérification pour éviter les doublons
 function loadGoogleMaps() {
@@ -66,9 +69,19 @@ function onPlayerReady(event) {
     event.target.playVideo();
 }
 
-// Fonction pour afficher le résultat et la ligne entre les points
+// Fonction pour afficher le résultat de la manche et mettre à jour le score total
 function displayResult(distance) {
-    document.getElementById("result").innerText = `Score : ${distance.toFixed(2)} km`;
+    // Affiche le score de la manche
+    resultDisplay.innerText = `Score de la manche : ${distance.toFixed(2)} km`;
+    
+    // Stocke le score de la manche actuelle
+    scores.push(distance);
+
+    // Calcule et affiche le score total actuel
+    const totalScore = scores.reduce((acc, curr) => acc + curr, 0);
+    totalScoreDisplay.innerText = `Score total : ${totalScore.toFixed(2)} km`;
+
+    // Trace la ligne entre le marqueur et la bonne réponse
     resultLine = new google.maps.Polyline({
         path: [
             userMarker.position,
@@ -81,22 +94,16 @@ function displayResult(distance) {
         map: map
     });
 
-    // Stocke le score de la manche actuelle
-    scores.push(distance);
-    
-    // Incrémente le compteur de manche
+    // Incrémente le compteur de manche et met à jour l'affichage de la manche
     roundCounter++;
+    roundInfo.innerText = `Manche : ${roundCounter}/${maxRounds}`;
 
     if (roundCounter < maxRounds) {
-        // Met à jour le bouton pour passer à la manche suivante
+        // Change le bouton pour passer à la manche suivante
         actionBtn.innerText = "Nouvelle chanson";
         actionBtn.onclick = startNewRound;
     } else {
-        // Affiche le score total après la dernière manche
-        const totalScore = scores.reduce((acc, curr) => acc + curr, 0);
-        document.getElementById("result").innerText = `Score total : ${totalScore.toFixed(2)} km`;
-
-        // Met à jour le bouton pour recommencer une nouvelle partie
+        // Affiche le score final et change le bouton pour recommencer une partie
         actionBtn.innerText = "Recommencer";
         actionBtn.onclick = resetGame;
     }
@@ -142,7 +149,7 @@ function validateMarker() {
 
 // Fonction pour démarrer une nouvelle manche
 function startNewRound() {
-    document.getElementById("result").innerText = "Score : ";
+    resultDisplay.innerText = "Score de la manche : ";
     if (resultLine) {
         resultLine.setMap(null);
     }
@@ -162,6 +169,8 @@ function startNewRound() {
 function resetGame() {
     roundCounter = 0;
     scores = [];
+    totalScoreDisplay.innerText = "Score total : 0 km";
+    roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
     startNewRound();
 }
 
