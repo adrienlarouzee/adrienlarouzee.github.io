@@ -1,5 +1,6 @@
 let player, map, userMarker = null, randomSong = {};
 let resultLine = null; // Variable pour stocker la ligne tracée entre les deux points
+const actionBtn = document.getElementById("actionBtn"); // Référence au bouton d'action
 
 // Fonction pour charger Google Maps dynamiquement avec async et vérification pour éviter les doublons
 function loadGoogleMaps() {
@@ -59,14 +60,12 @@ function onPlayerReady(event) {
 
 // Fonction pour afficher le résultat et la ligne entre les points
 function displayResult(distance) {
-    // Affiche la distance en km dans l'élément HTML du résultat
     document.getElementById("result").innerText = `Score : ${distance.toFixed(2)} km`;
 
-    // Trace une ligne entre le marqueur de l'utilisateur et la bonne réponse
     resultLine = new google.maps.Polyline({
         path: [
-            userMarker.position, // Position du marqueur utilisateur
-            { lat: randomSong.location.lat, lng: randomSong.location.lng } // Position de la bonne réponse
+            userMarker.position,
+            { lat: randomSong.location.lat, lng: randomSong.location.lng }
         ],
         geodesic: true,
         strokeColor: "#FF0000",
@@ -74,18 +73,20 @@ function displayResult(distance) {
         strokeWeight: 2,
         map: map
     });
+
+    // Remplacer le texte et la fonction du bouton après validation
+    actionBtn.innerText = "Nouvelle chanson";
+    actionBtn.onclick = startNewRound;
 }
 
 // Fonction pour placer un unique marqueur sur la carte
 function placeMarker(location) {
     const pinIcon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
 
-    // Supprime le marqueur précédent s'il existe
     if (userMarker) {
-        userMarker.map = null; // Supprime le marqueur de la carte
+        userMarker.map = null;
     }
 
-    // Crée un nouveau marqueur à la position cliquée
     const markerContent = document.createElement("img");
     markerContent.src = pinIcon;
     markerContent.style.width = "24px";
@@ -112,28 +113,42 @@ function validateMarker() {
     const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
     const userLocation = new google.maps.LatLng(userMarker.position.lat, userMarker.position.lng);
 
-    // Calcule la distance en km entre le marqueur et la position correcte
     const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, songLocation) / 1000;
-
-    // Affiche le résultat et trace une ligne entre les deux points
     displayResult(distance);
 }
 
-// Écouteur d'événement pour le bouton "Valider"
-document.getElementById("validateBtn").addEventListener("click", function() {
+// Fonction pour démarrer une nouvelle partie
+function startNewRound() {
+    // Réinitialise le résultat et la ligne de score
+    document.getElementById("result").innerText = "Score : ";
     if (resultLine) {
-        resultLine.setMap(null); // Supprime la ligne précédente
+        resultLine.setMap(null);
     }
-    validateMarker(); // Valide la position du marqueur
-});
+
+    // Supprime le marqueur précédent
+    if (userMarker) {
+        userMarker.map = null;
+        userMarker = null;
+    }
+
+    // Charge une nouvelle chanson
+    loadRandomSong();
+
+    // Réinitialise le bouton pour valider la prochaine réponse
+    actionBtn.innerText = "Valider";
+    actionBtn.onclick = validateMarker;
+}
+
+// Écouteur d'événement pour le bouton "Valider" qui devient "Nouvelle chanson" après validation
+actionBtn.onclick = validateMarker;
 
 // Utilisation de Promises pour charger les deux API
 Promise.all([
-    new Promise(resolve => window.onYouTubeIframeAPIReady = resolve), // Promise pour l'API YouTube
-    loadGoogleMaps() // Promise pour Google Maps
+    new Promise(resolve => window.onYouTubeIframeAPIReady = resolve),
+    loadGoogleMaps()
 ])
 .then(() => {
-    initMap(); // Initialise la carte après le chargement de Google Maps
-    loadRandomSong(); // Charge une chanson après le chargement de l’API YouTube
+    initMap();
+    loadRandomSong();
 })
 .catch(error => console.error("Erreur de chargement des API :", error));
