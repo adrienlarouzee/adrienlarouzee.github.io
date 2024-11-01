@@ -69,6 +69,7 @@ function loadRandomSong() {
                 'modestbranding': 1,
                 'controls': 0,
                 'disablekb': 1,
+                'showinfo': 0,
                 'rel': 0
             },
             events: { 
