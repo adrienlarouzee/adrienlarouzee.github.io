@@ -1,20 +1,7 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Initialiser la carte centrée sur l’Europe
-    const map = L.map("map").setView([50.8503, 4.3517], 4);
-
-    // Ajouter les tuiles de la carte
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-});
-
 let player;
 let map;
 let markers = [];  // Pour stocker les marqueurs
-let randomSong = {
-    title: "Never Gonna Give You Up",
-    artist: "Rick Astley"
-};
+let randomSong = {}; // Définir comme objet vide au départ
 
 // Fonction appelée par l'API YouTube une fois chargée
 function onYouTubeIframeAPIReady() {
@@ -26,7 +13,7 @@ function loadRandomSong() {
     fetch("data/songs.json")
         .then(response => response.json())
         .then(data => {
-            const randomSong = data[Math.floor(Math.random() * data.length)];
+            randomSong = data[Math.floor(Math.random() * data.length)]; // Mettre à jour la variable globale
             console.log("Morceau chargé :", randomSong.title);
 
             player = new YT.Player("youtube-player", {
@@ -47,7 +34,7 @@ function onPlayerReady(event) {
 }
 
 function initMap() {
-    // Initialise la carte
+    // Initialise la carte Google Maps
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 20, lng: 0 },  // Position initiale
         zoom: 2,
@@ -71,8 +58,8 @@ function placeMarker(location) {
     });
 
     // Assurer que randomSong est défini ici
-    if (!randomSong) {
-        console.error("randomSong n'est pas défini !");
+    if (!randomSong || !randomSong.title) {
+        console.error("randomSong n'est pas défini ou n'a pas de titre !");
         return;
     }
 
@@ -90,7 +77,6 @@ function placeMarker(location) {
 
     markers.push(marker);  // Ajouter le marqueur à la liste
 }
-
 
 // Charge la carte après le chargement de la page
 window.onload = function() {
