@@ -64,7 +64,14 @@ function loadRandomSong() {
             height: "100%",
             width: "100%",
             videoId: song.videoId,
-            playerVars: { 'enablejsapi': 1 },
+            playerVars: { 
+                'enablejsapi': 1,
+                'modestbranding': 1,
+                'controls': 0,
+                'disablekb': 1,
+                'rel': 0,
+                'start': 60 // Démarre la vidéo à 1 minute
+            },
             events: { 'onReady': onPlayerReady }
         });
     }
