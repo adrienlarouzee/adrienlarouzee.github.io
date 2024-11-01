@@ -72,33 +72,6 @@
         }
     },
     {
-        "title": "Con Calma",
-        "artist": "Daddy Yankee",
-        "videoId": "DiItGE3eAyQ",
-        "location": {
-            "lat": 18.4655,
-            "lng": -66.1057
-        }
-    },
-    {
-        "title": "Sakura",
-        "artist": "Ikimono Gakari",
-        "videoId": "Oe0fGXzKb28",
-        "location": {
-            "lat": 35.6895,
-            "lng": 139.6917
-        }
-    },
-    {
-        "title": "Zum Zum",
-        "artist": "Daddy Yankee",
-        "videoId": "j0k7gzxkS3Y",
-        "location": {
-            "lat": 40.7306,
-            "lng": -73.9866
-        }
-    },
-    {
         "title": "Alf Leila Wa Leila",
         "artist": "Umm Kulthum",
         "videoId": "ul4z6sLnXYY",
@@ -126,15 +99,6 @@
         }
     },
     {
-        "title": "Aicha",
-        "artist": "Khaled",
-        "videoId": "mrRPjzGeFQo",
-        "location": {
-            "lat": 36.7372,
-            "lng": 3.0866
-        }
-    },
-    {
         "title": "Dragostea Din Tei",
         "artist": "O-Zone",
         "videoId": "YnopHCL1Jk8",
@@ -150,33 +114,6 @@
         "location": {
             "lat": 52.5200,
             "lng": 13.4050
-        }
-    },
-    {
-        "title": "Macarena",
-        "artist": "Los Del Rio",
-        "videoId": "zWaymcVmJ-A",
-        "location": {
-            "lat": 37.3886,
-            "lng": -5.9823
-        }
-    },
-    {
-        "title": "Wavin' Flag",
-        "artist": "K'naan",
-        "videoId": "WTJSt4wP2ME",
-        "location": {
-            "lat": -0.0236,
-            "lng": 37.9062
-        }
-    },
-    {
-        "title": "Je te promets",
-        "artist": "Johnny Hallyday",
-        "videoId": "TkrMyXYbik",
-        "location": {
-            "lat": 48.8566,
-            "lng": 2.3522
         }
     },
     {
