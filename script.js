@@ -12,6 +12,7 @@ const totalScoreDisplay = document.getElementById("total-score");
 
 let hasPlayedOnce = false; // Indique si la lecture a déjà été initiée
 let markerPlaced = false; // Indique si un marqueur a été placé
+let currentSong = null; // Stocke la chanson actuelle pour éviter les doublons
 
 // Fonction pour charger Google Maps dynamiquement
 function loadGoogleMaps() {
@@ -104,9 +105,8 @@ function checkEnableActionBtn() {
 // Chargement de la chanson pour la manche actuelle
 function loadRandomSong() {
     if (roundCounter < maxRounds) { // Vérifie qu'il reste des manches
-        const song = currentPlaylist[roundCounter];
-        randomSong = song;
-        loadHiddenYoutubePlayer(song.videoId);
+        currentSong = currentPlaylist[roundCounter];
+        loadHiddenYoutubePlayer(currentSong.videoId);
         roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
     }
 }
@@ -120,7 +120,7 @@ function displayResult(distance) {
     totalScoreDisplay.innerText = `Total Distance : ${totalScore.toFixed(2)} km`;
 
     resultLine = new google.maps.Polyline({
-        path: [userMarker.position, { lat: randomSong.location.lat, lng: randomSong.location.lng }],
+        path: [userMarker.position, { lat: currentSong.location.lat, lng: currentSong.location.lng }],
         geodesic: true,
         strokeColor: "#FF0000",
         strokeOpacity: 1.0,
@@ -168,7 +168,7 @@ function validateMarker() {
         return;
     }
 
-    const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
+    const songLocation = new google.maps.LatLng(currentSong.location.lat, currentSong.location.lng);
     const userLocation = new google.maps.LatLng(userMarker.position.lat, userMarker.position.lng);
 
     const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, songLocation) / 1000;
@@ -186,8 +186,9 @@ function startNewRound() {
     }
 
     markerPlaced = false;
-    loadRandomSong();
+    loadRandomSong(); // Charge une nouvelle chanson pour chaque manche
     actionBtn.style.display = "none";
+    actionBtn.innerText = "GUESS"; // Remet le texte à "GUESS" pour chaque manche
 }
 
 // Réinitialiser le jeu après les 5 manches
