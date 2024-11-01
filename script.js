@@ -14,15 +14,11 @@ function loadRandomSong() {
         .then(response => response.json())
         .then(data => {
             randomSong = data[Math.floor(Math.random() * data.length)]; // Mettre à jour la variable globale
-
-            // Vérification si randomSong a bien la structure attendue
             if (!randomSong.location || !randomSong.location.lat || !randomSong.location.lng) {
                 console.error("randomSong n'a pas la structure attendue :", randomSong);
                 return;
             }
-
             console.log("Morceau chargé :", randomSong.title);
-
             player = new YT.Player("youtube-player", {
                 height: "100%",
                 width: "100%",
@@ -45,16 +41,11 @@ function onPlayerReady(event) {
 }
 
 function initMap() {
-    // Initialise la carte Google Maps avec un ID de carte
-    if (typeof google === 'undefined' || !google.maps) {
-        console.error("L'API Google Maps n'est pas chargée.");
-        return;
-    }
-
+    // Initialise la carte Google Maps
     map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 20, lng: 0 },  // Position initiale
+        center: { lat: 20, lng: 0 },
         zoom: 2,
-        mapId: 'MeloGuessrMap',  // Remplace par l'ID de ta carte
+        mapId: 'MeloGuessrMap',
     });
 
     // Événement de clic sur la carte
@@ -66,48 +57,42 @@ function initMap() {
 function placeMarker(location) {
     // Créer un élément pour le marqueur
     const markerContent = document.createElement("div");
-    markerContent.style.padding = "10px";  // Ajoute un peu de padding
-    markerContent.style.backgroundColor = "white";  // Fond blanc pour le marqueur
-    markerContent.style.border = "1px solid black";  // Bordure pour mieux visualiser
-    markerContent.style.borderRadius = "5px";  // Coins arrondis
-    markerContent.innerHTML = "Marqueur placé";  // Simple indication
+    markerContent.style.padding = "10px";  
+    markerContent.style.backgroundColor = "white";  
+    markerContent.style.border = "1px solid black";  
+    markerContent.style.borderRadius = "5px";  
+    markerContent.innerHTML = "Marqueur placé";  
 
     // Créer le marqueur avec AdvancedMarkerElement
     const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
-        content: markerContent,  // Utiliser l'élément créé
+        content: markerContent,  
     });
 
-    markers.push(marker);  // Ajouter le marqueur à la liste
+    markers.push(marker);  
 
-    // Ajouter la logique de validation ici
+    // Appeler validateMarker ici
     validateMarker(location);
 }
 
-function placeMarker(location) {
-    // Créer un élément pour le marqueur
-    const markerContent = document.createElement("div");
-    markerContent.style.padding = "10px";
-    markerContent.style.backgroundColor = "white";
-    markerContent.style.border = "1px solid black";
-    markerContent.style.borderRadius = "5px";
-    markerContent.innerHTML = "Marqueur placé";  // Simple indication
+function validateMarker(location) {
+    if (typeof google === 'undefined' || !google.maps || !google.maps.geometry) {
+        console.error("L'API Google Maps n'est pas chargée correctement.");
+        return;
+    }
 
-    // Créer le marqueur avec AdvancedMarkerElement
-    const marker = new google.maps.marker.AdvancedMarkerElement({
-        position: location,
-        map: map,
-        content: markerContent,  // Utiliser l'élément créé
-    });
+    if (!randomSong.location || !randomSong.location.lat || !randomSong.location.lng) {
+        console.error("randomSong n'a pas de coordonnées valides.");
+        return;
+    }
 
-    markers.push(marker);  // Ajouter le marqueur à la liste
-
-    // Ajouter la logique de validation ici
-    validateMarker(location);
+    const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
+    const distance = google.maps.geometry.spherical.computeDistanceBetween(location, songLocation);
+    console.log("Distance au lieu d'origine : " + distance + " mètres");
 }
 
 // Charge la carte après le chargement de la page
 window.onload = function() {
-    initMap();  // Appelle la fonction pour initialiser la carte
+    initMap(); 
 };
