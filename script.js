@@ -80,21 +80,22 @@ function displayResult(distance) {
 function placeMarker(location) {
     const pinIcon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
 
-    // Si un marqueur existe déjà, on le déplace, sinon on crée un nouveau marqueur
+    // Supprime le marqueur précédent s'il existe
     if (userMarker) {
-        userMarker.setPosition(location);
-    } else {
-        const markerContent = document.createElement("img");
-        markerContent.src = pinIcon;
-        markerContent.style.width = "24px";
-        markerContent.style.height = "24px";
-
-        userMarker = new google.maps.marker.AdvancedMarkerElement({
-            position: location,
-            map: map,
-            content: markerContent
-        });
+        userMarker.map = null; // Supprime le marqueur de la carte
     }
+
+    // Crée un nouveau marqueur à la position cliquée
+    const markerContent = document.createElement("img");
+    markerContent.src = pinIcon;
+    markerContent.style.width = "24px";
+    markerContent.style.height = "24px";
+
+    userMarker = new google.maps.marker.AdvancedMarkerElement({
+        position: location,
+        map: map,
+        content: markerContent
+    });
 }
 
 // Fonction pour valider la position du marqueur et calculer la distance par rapport au lieu d'origine de la chanson
