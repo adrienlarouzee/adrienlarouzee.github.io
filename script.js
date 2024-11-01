@@ -72,16 +72,28 @@ function placeMarker(location) {
 
 // Fonction pour valider le placement du marqueur
 function validateMarker(location) {
-    // Récupérer la vraie position de la chanson depuis le JSON (ajouter cette info à tes données JSON)
-    const trueLocation = randomSong.location; // Assurez-vous que votre JSON a une propriété 'location' avec lat et lng
+    // Assure-toi que google.maps est bien défini
+    if (typeof google === 'undefined' || !google.maps) {
+        console.error("Google Maps n'est pas défini !");
+        return;
+    }
 
-    const distance = google.maps.geometry.spherical.computeDistanceBetween(
-        new google.maps.LatLng(location.lat(), location.lng()),
-        new google.maps.LatLng(trueLocation.lat, trueLocation.lng)
-    );
+    // Vérifie que randomSong a une location
+    if (!randomSong || !randomSong.location) {
+        console.error("randomSong n'est pas défini ou n'a pas de location !");
+        return;
+    }
 
-    alert("Distance entre votre marqueur et la vraie position : " + (distance / 1000).toFixed(2) + " km");
+    // Récupérer la position de la chanson
+    const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
+    
+    // Calculer la distance entre la position du marqueur et celle de la chanson
+    const distance = google.maps.geometry.spherical.computeDistanceBetween(location, songLocation);
+    
+    // Affiche le résultat ou procède à la validation
+    console.log("Distance au lieu d'origine : " + distance + " mètres");
 }
+
 
 // Charge la carte après le chargement de la page
 window.onload = function() {
