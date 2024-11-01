@@ -1,17 +1,20 @@
 let player, map, userMarker = null, randomSong = {};
-let resultLine = null; // Variable pour stocker la ligne tracée entre les deux points
-const actionBtn = document.getElementById("actionBtn"); // Référence au bouton d'action
+let resultLine = null;
+let roundCounter = 0; // Compteur de manche
+let scores = []; // Tableau pour stocker les scores de chaque manche
+const maxRounds = 5; // Nombre de manches
+const actionBtn = document.getElementById("actionBtn");
 
 // Fonction pour charger Google Maps dynamiquement avec async et vérification pour éviter les doublons
 function loadGoogleMaps() {
     return new Promise((resolve, reject) => {
         if (typeof google !== "undefined" && google.maps) {
-            resolve(); // Si Google Maps est déjà chargé, on résout la promesse
+            resolve();
         } else {
             const script = document.createElement("script");
             script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&async=1";
             script.async = true;
-            script.onload = () => resolve(); // Résout la Promise quand le script est chargé
+            script.onload = () => resolve();
             script.onerror = () => reject("Erreur de chargement de Google Maps");
             document.head.appendChild(script);
         }
@@ -43,11 +46,9 @@ function loadRandomSong() {
                 return;
             }
 
-            // Vérifie si le lecteur existe et charge une nouvelle vidéo si c'est le cas
             if (player && typeof player.loadVideoById === "function") {
                 player.loadVideoById(randomSong.videoId);
             } else {
-                // Crée le lecteur YouTube si ce n'est pas déjà fait
                 player = new YT.Player("youtube-player", {
                     height: "100%",
                     width: "100%",
@@ -62,13 +63,12 @@ function loadRandomSong() {
 
 // Fonction appelée lorsque le lecteur YouTube est prêt
 function onPlayerReady(event) {
-    event.target.playVideo(); // Lecture automatique de la vidéo
+    event.target.playVideo();
 }
 
 // Fonction pour afficher le résultat et la ligne entre les points
 function displayResult(distance) {
     document.getElementById("result").innerText = `Score : ${distance.toFixed(2)} km`;
-
     resultLine = new google.maps.Polyline({
         path: [
             userMarker.position,
@@ -81,9 +81,25 @@ function displayResult(distance) {
         map: map
     });
 
-    // Remplacer le texte et la fonction du bouton après validation
-    actionBtn.innerText = "Nouvelle chanson";
-    actionBtn.onclick = startNewRound;
+    // Stocke le score de la manche actuelle
+    scores.push(distance);
+    
+    // Incrémente le compteur de manche
+    roundCounter++;
+
+    if (roundCounter < maxRounds) {
+        // Met à jour le bouton pour passer à la manche suivante
+        actionBtn.innerText = "Nouvelle chanson";
+        actionBtn.onclick = startNewRound;
+    } else {
+        // Affiche le score total après la dernière manche
+        const totalScore = scores.reduce((acc, curr) => acc + curr, 0);
+        document.getElementById("result").innerText = `Score total : ${totalScore.toFixed(2)} km`;
+
+        // Met à jour le bouton pour recommencer une nouvelle partie
+        actionBtn.innerText = "Recommencer";
+        actionBtn.onclick = resetGame;
+    }
 }
 
 // Fonction pour placer un unique marqueur sur la carte
@@ -124,29 +140,32 @@ function validateMarker() {
     displayResult(distance);
 }
 
-// Fonction pour démarrer une nouvelle partie
+// Fonction pour démarrer une nouvelle manche
 function startNewRound() {
-    // Réinitialise le résultat et la ligne de score
     document.getElementById("result").innerText = "Score : ";
     if (resultLine) {
         resultLine.setMap(null);
     }
 
-    // Supprime le marqueur précédent
     if (userMarker) {
         userMarker.map = null;
         userMarker = null;
     }
 
-    // Charge une nouvelle chanson
     loadRandomSong();
 
-    // Réinitialise le bouton pour valider la prochaine réponse
     actionBtn.innerText = "Valider";
     actionBtn.onclick = validateMarker;
 }
 
-// Écouteur d'événement pour le bouton "Valider" qui devient "Nouvelle chanson" après validation
+// Fonction pour réinitialiser le jeu après les 5 manches
+function resetGame() {
+    roundCounter = 0;
+    scores = [];
+    startNewRound();
+}
+
+// Écouteur d'événement pour le bouton d'action
 actionBtn.onclick = validateMarker;
 
 // Utilisation de Promises pour charger les deux API
