@@ -39,3 +39,32 @@ function onPlayerReady(event) {
     console.log("Lecteur prêt");
     event.target.playVideo();  // Lecture automatique activée
 }
+
+let map;
+let markers = [];  // Pour stocker les marqueurs
+
+function initMap() {
+    // Initialise la carte
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 20, lng: 0 },  // Position initiale
+        zoom: 2,
+    });
+
+    // Événement de clic sur la carte
+    map.addListener("click", function(event) {
+        placeMarker(event.latLng);
+    });
+}
+
+function placeMarker(location) {
+    const marker = new google.maps.Marker({
+        position: location,
+        map: map,
+    });
+    markers.push(marker);  // Ajouter le marqueur à la liste
+}
+
+// Charge la carte après le chargement de la page
+window.onload = function() {
+    initMap();  // Appelle la fonction pour initialiser la carte
+};
