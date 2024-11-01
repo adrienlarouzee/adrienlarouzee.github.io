@@ -42,20 +42,27 @@ function loadRandomSong() {
                 console.error("Coordonnées manquantes :", randomSong);
                 return;
             }
-            player = new YT.Player("youtube-player", {
-                height: "100%",
-                width: "100%",
-                videoId: randomSong.videoId,
-                playerVars: { 'enablejsapi': 1 },
-                events: { 'onReady': onPlayerReady }
-            });
+
+            // Vérifie si le lecteur existe et charge une nouvelle vidéo si c'est le cas
+            if (player && typeof player.loadVideoById === "function") {
+                player.loadVideoById(randomSong.videoId);
+            } else {
+                // Crée le lecteur YouTube si ce n'est pas déjà fait
+                player = new YT.Player("youtube-player", {
+                    height: "100%",
+                    width: "100%",
+                    videoId: randomSong.videoId,
+                    playerVars: { 'enablejsapi': 1 },
+                    events: { 'onReady': onPlayerReady }
+                });
+            }
         })
         .catch(error => console.error("Erreur de chargement:", error));
 }
 
 // Fonction appelée lorsque le lecteur YouTube est prêt
 function onPlayerReady(event) {
-    event.target.playVideo();
+    event.target.playVideo(); // Lecture automatique de la vidéo
 }
 
 // Fonction pour afficher le résultat et la ligne entre les points
