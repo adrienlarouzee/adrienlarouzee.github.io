@@ -53,6 +53,7 @@ function generateUniquePlaylist(data) {
 }
 
 const playBtn = document.getElementById("playBtn"); // Bouton de lecture
+let hasPlayedOnce = false; // Variable pour savoir si la lecture a déjà été initiée une fois
 
 // Fonction de chargement du lecteur YouTube en mode caché pour la manche actuelle
 function loadHiddenYoutubePlayer(videoId) {
@@ -73,16 +74,22 @@ function loadHiddenYoutubePlayer(videoId) {
         },
         events: { 
             'onReady': function(event) {
-                // Masquer le bouton si autoplay fonctionne, sinon le rendre visible
-                playBtn.style.display = "block"; 
-                playBtn.onclick = function() {
+                // Si la lecture a déjà été lancée une fois, démarre automatiquement sans bouton
+                if (hasPlayedOnce) {
                     event.target.playVideo();
-                    playBtn.style.display = "none"; // Masquer le bouton après le démarrage
-                };
+                } else {
+                    // Affiche le bouton pour la première fois seulement si la lecture automatique est bloquée
+                    playBtn.style.display = "block";
+                    playBtn.onclick = function() {
+                        event.target.playVideo();
+                        playBtn.style.display = "none"; // Masque le bouton après le démarrage
+                        hasPlayedOnce = true; // Marque que la lecture a été initiée une fois
+                    };
+                }
             },
             'onStateChange': function(event) {
-                // Afficher le bouton si la lecture est bloquée
-                if (event.data === YT.PlayerState.PAUSED) {
+                // Affiche le bouton uniquement si la vidéo est en pause au début et que c'est le premier morceau
+                if (event.data === YT.PlayerState.PAUSED && !hasPlayedOnce) {
                     playBtn.style.display = "block";
                 }
             }
