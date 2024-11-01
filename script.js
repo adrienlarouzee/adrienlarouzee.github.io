@@ -1,4 +1,5 @@
 let player, map, markers = [], randomSong = {};
+let resultLine = null; // Variable pour stocker la ligne tracée entre les deux points
 
 // Fonction pour charger Google Maps dynamiquement avec async et vérification pour éviter les doublons
 function loadGoogleMaps() {
@@ -55,18 +56,38 @@ function onPlayerReady(event) {
     event.target.playVideo();
 }
 
+// Fonction pour afficher le résultat et la ligne entre les points
+function displayResult(distance, location) {
+    // Affiche la distance en km dans l'élément HTML du résultat
+    document.getElementById("result").innerText = `Score : ${distance.toFixed(2)} km`;
+
+    // Efface la ligne précédente, si elle existe
+    if (resultLine) {
+        resultLine.setMap(null);
+    }
+
+    // Trace une ligne entre le marqueur de l'utilisateur et la bonne réponse
+    resultLine = new google.maps.Polyline({
+        path: [
+            location, // Position du marqueur utilisateur
+            { lat: randomSong.location.lat, lng: randomSong.location.lng } // Position de la bonne réponse
+        ],
+        geodesic: true,
+        strokeColor: "#FF0000",
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+        map: map
+    });
+}
+
 // Fonction pour placer un marqueur sur la carte
 function placeMarker(location) {
-    // URL de l'image du pin classique Google Maps
     const pinIcon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
-
-    // Crée l'élément pour le contenu du marqueur avec l'icône de pin classique
     const markerContent = document.createElement("img");
     markerContent.src = pinIcon;
-    markerContent.style.width = "24px"; // Ajustez la taille selon vos préférences
+    markerContent.style.width = "24px";
     markerContent.style.height = "24px";
 
-    // Crée un marqueur avec AdvancedMarkerElement
     const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
@@ -74,7 +95,7 @@ function placeMarker(location) {
     });
 
     markers.push(marker);
-    validateMarker(location);
+    validateMarker(location); // Appelle la validation pour calculer la distance et afficher le score
 }
 
 // Fonction pour valider la position du marqueur et calculer la distance par rapport au lieu d'origine de la chanson
@@ -89,8 +110,13 @@ function validateMarker(location) {
     }
 
     const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
-    const distance = google.maps.geometry.spherical.computeDistanceBetween(location, songLocation);
-    console.log("Distance au lieu d'origine : " + (distance / 1000).toFixed(2) + " km");
+    const userLocation = new google.maps.LatLng(location.lat(), location.lng());
+
+    // Calcule la distance en km entre le marqueur et la position correcte
+    const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, songLocation) / 1000;
+
+    // Affiche le résultat et trace une ligne entre les deux points
+    displayResult(distance, location);
 }
 
 // Utilisation de Promises pour charger les deux API
