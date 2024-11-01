@@ -12,10 +12,11 @@ let player;
 
 // Fonction appelée par l'API YouTube une fois chargée
 function onYouTubeIframeAPIReady() {
+    console.log("API YouTube chargée");
     player = new YT.Player("youtube-player", {
         height: "100%",
         width: "100%",
-        videoId: "dQw4w9WgXcQ", // Remplace cette ID par celle de n’importe quelle vidéo pour tester
+        videoId: "dQw4w9WgXcQ",
         events: {
             'onReady': onPlayerReady
         }
@@ -23,5 +24,6 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerReady(event) {
+    console.log("Lecteur prêt");
     event.target.playVideo();
 }
