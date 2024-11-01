@@ -33,11 +33,13 @@ function onPlayerReady(event) {
     event.target.playVideo();  // Lecture automatique activée
 }
 
+
 function initMap() {
-    // Initialise la carte Google Maps
+    // Initialise la carte Google Maps avec un ID de carte
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 20, lng: 0 },  // Position initiale
         zoom: 2,
+        mapId: 'MeloGuessrMap',  // Remplace par l'ID de ta carte
     });
 
     // Événement de clic sur la carte
