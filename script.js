@@ -85,27 +85,26 @@ function placeMarker(location) {
     validateMarker(location);
 }
 
-function validateMarker(location) {
-    // Vérifie si google et google.maps sont définis
-    if (typeof google === 'undefined' || !google.maps || !google.maps.geometry) {
-        console.error("L'API Google Maps n'est pas chargée correctement.");
-        return;
-    }
+function placeMarker(location) {
+    // Créer un élément pour le marqueur
+    const markerContent = document.createElement("div");
+    markerContent.style.padding = "10px";
+    markerContent.style.backgroundColor = "white";
+    markerContent.style.border = "1px solid black";
+    markerContent.style.borderRadius = "5px";
+    markerContent.innerHTML = "Marqueur placé";  // Simple indication
 
-    // Assure-toi que randomSong contient des valeurs valides
-    if (!randomSong.location || !randomSong.location.lat || !randomSong.location.lng) {
-        console.error("randomSong n'a pas de coordonnées valides.");
-        return;
-    }
+    // Créer le marqueur avec AdvancedMarkerElement
+    const marker = new google.maps.marker.AdvancedMarkerElement({
+        position: location,
+        map: map,
+        content: markerContent,  // Utiliser l'élément créé
+    });
 
-    // Récupérer la position de la chanson
-    const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
-    
-    // Calculer la distance entre la position du marqueur et celle de la chanson
-    const distance = google.maps.geometry.spherical.computeDistanceBetween(location, songLocation);
-    
-    // Affiche le résultat ou procède à la validation
-    console.log("Distance au lieu d'origine : " + distance + " mètres");
+    markers.push(marker);  // Ajouter le marqueur à la liste
+
+    // Ajouter la logique de validation ici
+    validateMarker(location);
 }
 
 // Charge la carte après le chargement de la page
