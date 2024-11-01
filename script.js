@@ -69,10 +69,14 @@ function loadRandomSong() {
                 'modestbranding': 1,
                 'controls': 0,
                 'disablekb': 1,
-                'rel': 0,
-                'start': 60 // Démarre la vidéo à 1 minute
+                'rel': 0
             },
-            events: { 'onReady': onPlayerReady }
+            events: { 
+                'onReady': function(event) {
+                    event.target.seekTo(60, true); // Déplace la tête de lecture à 60 secondes
+                    event.target.playVideo(); // Démarre la vidéo à partir de 60 secondes
+                }
+            }
         });
     }
 }
