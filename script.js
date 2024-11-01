@@ -96,7 +96,7 @@ function loadHiddenYoutubePlayer(videoId) {
     });
 }
 
-// Activer le bouton "Valider" seulement si la musique a démarré et un marqueur est placé
+// Activer le bouton "GUESS" seulement si la musique a démarré et un marqueur est placé
 function checkEnableActionBtn() {
     actionBtn.style.display = hasPlayedOnce && markerPlaced ? "block" : "none";
 }
@@ -197,16 +197,17 @@ function resetGame() {
     markerPlaced = false;
     playBtn.style.display = "none";
     actionBtn.style.display = "none";
-    totalScoreDisplay.innerText = "Score total : 0 km";
+    totalScoreDisplay.innerText = "Total Distance : 0 km";
     totalScoreDisplay.style.fontWeight = "normal";
     totalScoreDisplay.style.color = "black";
-    roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
+    roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
+    resultDisplay.innerText = "Distance : ";
 
     fetch("data/songs.json")
         .then(response => response.json())
         .then(data => {
-            currentPlaylist = generateUniquePlaylist(data);
-            console.log("Playlist de la partie :", currentPlaylist);
+            currentPlaylist = generateUniquePlaylist(data); // Crée une nouvelle playlist aléatoire
+            console.log("Playlist de la partie :", currentPlaylist); // Debug : affiche la playlist dans la console
             startNewRound();
         });
 }
@@ -222,8 +223,11 @@ Promise.all([
         .then(response => response.json())
         .then(data => {
             currentPlaylist = generateUniquePlaylist(data);
-            console.log("Playlist de la partie :", currentPlaylist);
+            console.log("Playlist de la partie :", currentPlaylist); // Debug : affiche la playlist dans la console
             loadRandomSong();
         });
 })
 .catch(error => console.error("Erreur de chargement des API :", error));
+
+// Écouteur d'événement pour le bouton GUESS
+actionBtn.onclick = validateMarker;
