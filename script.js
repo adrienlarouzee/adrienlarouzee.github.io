@@ -5,22 +5,18 @@ let scores = [];
 let currentPlaylist = []; // Liste des 5 morceaux uniques pour la partie
 const maxRounds = 5;
 const actionBtn = document.getElementById("actionBtn");
-const playBtn = document.getElementById("playBtn");
 const roundInfo = document.getElementById("round-info");
 const resultDisplay = document.getElementById("result");
 const totalScoreDisplay = document.getElementById("total-score");
 
-let hasPlayedOnce = false; // Indique si la lecture a déjà été initiée
-let markerPlaced = false; // Indique si un marqueur a été placé
-
-// Fonction pour charger Google Maps dynamiquement
+// Fonction pour charger Google Maps dynamiquement avec async et vérification pour éviter les doublons
 function loadGoogleMaps() {
     return new Promise((resolve, reject) => {
         if (typeof google !== "undefined" && google.maps) {
             resolve();
         } else {
             const script = document.createElement("script");
-            script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&async=1";
+            script.src = "https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=geometry,marker&async=1";
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject("Erreur de chargement de Google Maps");
@@ -29,7 +25,7 @@ function loadGoogleMaps() {
     });
 }
 
-// Initialisation de la carte Google Maps
+// Fonction pour initialiser la carte Google Maps
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 20, lng: 0 },
@@ -42,7 +38,7 @@ function initMap() {
     });
 }
 
-// Sélectionner 5 morceaux uniques
+// Fonction pour sélectionner 5 morceaux uniques
 function generateUniquePlaylist(data) {
     const playlist = [];
     const availableSongs = [...data];
@@ -55,6 +51,9 @@ function generateUniquePlaylist(data) {
 
     return playlist;
 }
+
+const playBtn = document.getElementById("playBtn"); // Bouton de lecture
+let hasPlayedOnce = false; // Variable pour savoir si la lecture a déjà été initiée une fois
 
 // Fonction de chargement du lecteur YouTube en mode caché pour la manche actuelle
 function loadHiddenYoutubePlayer(videoId) {
@@ -143,12 +142,13 @@ function displayResult(distance) {
     }
 }
 
-
-// Placement d'un marqueur unique sur la carte
+// Fonction pour placer un unique marqueur sur la carte
 function placeMarker(location) {
     const pinIcon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
 
-    if (userMarker) userMarker.map = null;
+    if (userMarker) {
+        userMarker.map = null;
+    }
 
     const markerContent = document.createElement("img");
     markerContent.src = pinIcon;
@@ -160,39 +160,38 @@ function placeMarker(location) {
         map: map,
         content: markerContent
     });
-
-    markerPlaced = true;
-    checkEnableActionBtn();
 }
 
-// Calcul de la distance entre le marqueur et la réponse
+// Fonction pour valider la position du marqueur et calculer la distance
 function validateMarker() {
     if (!google.maps || !google.maps.geometry || !userMarker) {
         console.error("Google Maps non chargée ou marqueur non placé.");
         return;
     }
 
-    const songLocation = new google.maps.LatLng(currentPlaylist[roundCounter].location.lat, currentPlaylist[roundCounter].location.lng);
+    const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
     const userLocation = new google.maps.LatLng(userMarker.position.lat, userMarker.position.lng);
 
     const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, songLocation) / 1000;
     displayResult(distance);
 }
 
-// Démarrer une nouvelle manche
+// Fonction pour démarrer une nouvelle manche
 function startNewRound() {
-    resultDisplay.innerText = "Distance : ";
-    if (resultLine) resultLine.setMap(null);
+    resultDisplay.innerText = "Score de la manche : ";
+    if (resultLine) {
+        resultLine.setMap(null);
+    }
 
     if (userMarker) {
         userMarker.map = null;
         userMarker = null;
     }
 
-    markerPlaced = false;
-    loadCurrentSong(); // Charge une nouvelle chanson pour chaque manche
-    actionBtn.style.display = "none";
-    actionBtn.innerText = "GUESS"; // Remet le texte à "GUESS" pour chaque manche
+    loadRandomSong();
+
+    actionBtn.innerText = "Valider";
+    actionBtn.onclick = validateMarker;
 }
 
 // Fonction pour réinitialiser le jeu après les 5 manches
@@ -218,7 +217,10 @@ function resetGame() {
         });
 }
 
-// Initialisation des événements et de la partie
+// Écouteur d'événement pour le bouton d'action
+actionBtn.onclick = validateMarker;
+
+// Initialisation de la partie et génération de la playlist unique
 Promise.all([
     new Promise(resolve => window.onYouTubeIframeAPIReady = resolve),
     loadGoogleMaps()
@@ -229,11 +231,11 @@ Promise.all([
         .then(response => response.json())
         .then(data => {
             currentPlaylist = generateUniquePlaylist(data);
-            console.log("Playlist de la partie :", currentPlaylist); // Debug : affiche la playlist dans la console
-            loadCurrentSong();
+
+            // Affiche la playlist dans la console pour le debug
+            console.log("Playlist de la partie :", currentPlaylist);
+
+            loadRandomSong();
         });
 })
 .catch(error => console.error("Erreur de chargement des API :", error));
-
-// Écouteur d'événement pour le bouton GUESS
-actionBtn.onclick = validateMarker;
