@@ -110,7 +110,7 @@ function validateMarker() {
     }
 
     const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
-    const userLocation = new google.maps.LatLng(userMarker.position.lat(), userMarker.position.lng());
+    const userLocation = new google.maps.LatLng(userMarker.position.lat, userMarker.position.lng);
 
     // Calcule la distance en km entre le marqueur et la position correcte
     const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, songLocation) / 1000;
