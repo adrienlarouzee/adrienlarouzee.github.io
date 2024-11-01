@@ -56,21 +56,31 @@ function initMap() {
 }
 
 function placeMarker(location) {
-    const marker = new google.maps.Marker({
+    const marker = new google.maps.marker.AdvancedMarkerElement({
         position: location,
         map: map,
-    });
-    markers.push(marker);  // Ajouter le marqueur à la liste
-
-    // Remplacer "Titre de la chanson" et "Artiste" par des données réelles
-    const infoWindow = new google.maps.InfoWindow({
-        content: "Titre de la chanson: " + randomSong.title + "<br>Artiste: " + randomSong.artist
+        content: document.createElement("div"),  // Élément DOM pour le marqueur
     });
 
-    // Ajouter un événement pour ouvrir l'infobulle quand le marqueur est cliqué
+    // Assurer que randomSong est défini ici
+    if (!randomSong) {
+        console.error("randomSong n'est pas défini !");
+        return;
+    }
+
+    // Créer un contenu pour l'infobulle
+    const infoContent = document.createElement("div");
+    infoContent.innerHTML = "Titre de la chanson: " + randomSong.title + "<br>Artiste: " + randomSong.artist;
+
+    // Écouter le clic sur le marqueur pour ouvrir l'infobulle
     marker.addListener("click", function() {
+        const infoWindow = new google.maps.InfoWindow({
+            content: infoContent,
+        });
         infoWindow.open(map, marker);
     });
+
+    markers.push(marker);  // Ajouter le marqueur à la liste
 }
 
 
