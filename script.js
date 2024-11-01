@@ -84,6 +84,12 @@ function validateMarker(location) {
         return;
     }
 
+    // Assure-toi que randomSong contient des valeurs valides
+    if (!randomSong.location || !randomSong.location.lat || !randomSong.location.lng) {
+        console.error("randomSong n'a pas de coordonnées valides.");
+        return;
+    }
+
     // Récupérer la position de la chanson
     const songLocation = new google.maps.LatLng(randomSong.location.lat, randomSong.location.lng);
     
