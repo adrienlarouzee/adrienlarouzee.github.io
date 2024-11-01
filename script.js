@@ -13,7 +13,7 @@ const totalScoreDisplay = document.getElementById("total-score");
 let hasPlayedOnce = false; // Indique si la lecture a déjà été initiée
 let markerPlaced = false; // Indique si un marqueur a été placé
 
-// Fonction pour charger Google Maps dynamiquement
+// Fonction pour charger Google Maps dynamiquementt
 function loadGoogleMaps() {
     return new Promise((resolve, reject) => {
         if (typeof google !== "undefined" && google.maps) {
