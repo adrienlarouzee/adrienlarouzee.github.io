@@ -16,7 +16,7 @@ function loadGoogleMaps() {
             resolve();
         } else {
             const script = document.createElement("script");
-            script.src = "https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=geometry,marker&async=1";
+            script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&async=1";
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject("Erreur de chargement de Google Maps");
