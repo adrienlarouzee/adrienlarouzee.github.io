@@ -12,7 +12,6 @@ const totalScoreDisplay = document.getElementById("total-score");
 
 let hasPlayedOnce = false; // Indique si la lecture a déjà été initiée
 let markerPlaced = false; // Indique si un marqueur a été placé
-let currentSong = null; // Stocke la chanson actuelle pour éviter les doublons
 
 // Fonction pour charger Google Maps dynamiquement
 function loadGoogleMaps() {
@@ -103,12 +102,10 @@ function checkEnableActionBtn() {
 }
 
 // Chargement de la chanson pour la manche actuelle
-function loadRandomSong() {
-    if (roundCounter < maxRounds) { // Vérifie qu'il reste des manches
-        currentSong = currentPlaylist[roundCounter];
-        loadHiddenYoutubePlayer(currentSong.videoId);
-        roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
-    }
+function loadCurrentSong() {
+    const song = currentPlaylist[roundCounter];
+    loadHiddenYoutubePlayer(song.videoId);
+    roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
 }
 
 // Affichage du résultat de la manche et mise à jour du score total
@@ -120,7 +117,7 @@ function displayResult(distance) {
     totalScoreDisplay.innerText = `Total Distance : ${totalScore.toFixed(2)} km`;
 
     resultLine = new google.maps.Polyline({
-        path: [userMarker.position, { lat: currentSong.location.lat, lng: currentSong.location.lng }],
+        path: [userMarker.position, { lat: currentPlaylist[roundCounter].location.lat, lng: currentPlaylist[roundCounter].location.lng }],
         geodesic: true,
         strokeColor: "#FF0000",
         strokeOpacity: 1.0,
@@ -168,7 +165,7 @@ function validateMarker() {
         return;
     }
 
-    const songLocation = new google.maps.LatLng(currentSong.location.lat, currentSong.location.lng);
+    const songLocation = new google.maps.LatLng(currentPlaylist[roundCounter].location.lat, currentPlaylist[roundCounter].location.lng);
     const userLocation = new google.maps.LatLng(userMarker.position.lat, userMarker.position.lng);
 
     const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, songLocation) / 1000;
@@ -186,7 +183,7 @@ function startNewRound() {
     }
 
     markerPlaced = false;
-    loadRandomSong(); // Charge une nouvelle chanson pour chaque manche
+    loadCurrentSong(); // Charge une nouvelle chanson pour chaque manche
     actionBtn.style.display = "none";
     actionBtn.innerText = "GUESS"; // Remet le texte à "GUESS" pour chaque manche
 }
@@ -226,7 +223,7 @@ Promise.all([
         .then(data => {
             currentPlaylist = generateUniquePlaylist(data);
             console.log("Playlist de la partie :", currentPlaylist); // Debug : affiche la playlist dans la console
-            loadRandomSong();
+            loadCurrentSong();
         });
 })
 .catch(error => console.error("Erreur de chargement des API :", error));
