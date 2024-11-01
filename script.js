@@ -16,7 +16,7 @@ function loadGoogleMaps() {
             resolve();
         } else {
             const script = document.createElement("script");
-            script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAqrx665fYTb11wQJoRx48kfUjZ5rW-GPw&libraries=geometry,marker&async=1";
+            script.src = "https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=geometry,marker&async=1";
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject("Erreur de chargement de Google Maps");
@@ -97,7 +97,6 @@ function loadHiddenYoutubePlayer(videoId) {
     });
 }
 
-
 // Fonction de chargement de chanson pour la manche actuelle
 function loadRandomSong() {
     const song = currentPlaylist[roundCounter];
@@ -143,24 +142,27 @@ function displayResult(distance) {
     }
 }
 
-// Fonction pour placer un unique marqueur sur la carte
-function placeMarker(location) {
-    const pinIcon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+// Fonction pour réinitialiser le jeu après les 5 manches
+function resetGame() {
+    roundCounter = 0;
+    scores = [];
+    hasPlayedOnce = false; // Réinitialiser hasPlayedOnce pour la nouvelle partie
+    playBtn.style.display = "none"; // Masquer le bouton au début du reset
+    totalScoreDisplay.innerText = "Score total : 0 km";
+    totalScoreDisplay.style.fontWeight = "normal";
+    totalScoreDisplay.style.color = "black";
+    roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
 
-    if (userMarker) {
-        userMarker.map = null;
-    }
+    fetch("data/songs.json")
+        .then(response => response.json())
+        .then(data => {
+            currentPlaylist = generateUniquePlaylist(data); // Crée une nouvelle playlist pour la partie
 
-    const markerContent = document.createElement("img");
-    markerContent.src = pinIcon;
-    markerContent.style.width = "24px";
-    markerContent.style.height = "24px";
+            // Affiche la playlist dans la console pour le debug
+            console.log("Playlist de la partie :", currentPlaylist);
 
-    userMarker = new google.maps.marker.AdvancedMarkerElement({
-        position: location,
-        map: map,
-        content: markerContent
-    });
+            startNewRound();
+        });
 }
 
 // Fonction pour valider la position du marqueur et calculer la distance
@@ -199,8 +201,6 @@ function startNewRound() {
 function resetGame() {
     roundCounter = 0;
     scores = [];
-    hasPlayedOnce = false; // Réinitialiser hasPlayedOnce pour la nouvelle partie
-    playBtn.style.display = "none"; // Masquer le bouton au début du reset
     totalScoreDisplay.innerText = "Score total : 0 km";
     totalScoreDisplay.style.fontWeight = "normal";
     totalScoreDisplay.style.color = "black";
