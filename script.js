@@ -90,11 +90,11 @@ function loadRandomSong() {
 
 // Afficher le résultat de la manche et le score total
 function displayResult(distance) {
-    resultDisplay.innerText = `Score de la manche : ${distance.toFixed(2)} km`;
+    resultDisplay.innerText = `Round score : ${distance.toFixed(2)} km`;
     scores.push(distance);
 
     const totalScore = scores.reduce((acc, curr) => acc + curr, 0);
-    totalScoreDisplay.innerText = `Score total : ${totalScore.toFixed(2)} km`;
+    totalScoreDisplay.innerText = `Total score : ${totalScore.toFixed(2)} km`;
 
     // Tracer une ligne entre le marqueur et le lieu d'origine du morceau
     resultLine = new google.maps.Polyline({
@@ -151,8 +151,11 @@ function startNewRound() {
     if (resultLine) resultLine.setMap(null);
     if (userMarker) userMarker.setMap(null);
 
+    // Met à jour l'information de la manche pour afficher la progression
+    roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
+
     loadRandomSong();
-    actionBtn.innerText = "Valider";
+    actionBtn.innerText = "GUESS";
     actionBtn.onclick = validateMarker;
 }
 
@@ -165,7 +168,7 @@ function resetGame() {
     totalScoreDisplay.innerText = "Score total : 0 km";
     totalScoreDisplay.style.fontWeight = "normal";
     totalScoreDisplay.style.color = "black";
-    roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
+    roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
 
     fetch("data/songs.json")
         .then((response) => response.json())
