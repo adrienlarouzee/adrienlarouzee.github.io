@@ -116,7 +116,7 @@ function displayResult(distance) {
     } else {
         if (player) player.stopVideo();
         totalScoreDisplay.innerHTML = `<strong style="color: red;">Score total : ${totalScore.toFixed(2)} km</strong>`;
-        actionBtn.innerText = "Recommencer";
+        actionBtn.innerText = "RESTART";
         actionBtn.onclick = resetGame;
     }
 }
@@ -174,7 +174,7 @@ function resetGame() {
         .then((response) => response.json())
         .then((data) => {
             currentPlaylist = generateUniquePlaylist(data);
-            console.log("Nouvelle playlist :", currentPlaylist);  // Debug
+            console.log("New playlist :", currentPlaylist);  // Debug
             startNewRound();
         });
 }
@@ -190,7 +190,7 @@ Promise.all([
         .then((response) => response.json())
         .then((data) => {
             currentPlaylist = generateUniquePlaylist(data);
-            console.log("Playlist initiale :", currentPlaylist);  // Debug
+            console.log("First Playlist :", currentPlaylist);  // Debug
             loadRandomSong();
         });
 })
