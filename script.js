@@ -4,13 +4,15 @@ let roundCounter = 0;
 let scores = [];
 let currentPlaylist = [];
 const maxRounds = 5;
-const actionBtn = document.getElementById("actionBtn");
 const playBtn = document.getElementById("playBtn");
+const guessBtn = document.getElementById("guessBtn");
+const nextBtn = document.getElementById("nextBtn");
 const roundInfo = document.getElementById("round-info");
 const resultDisplay = document.getElementById("result");
 const totalScoreDisplay = document.getElementById("total-score");
 
 let hasPlayedOnce = false;
+let markerPlaced = false;
 
 // Charger Google Maps
 function loadGoogleMaps() {
@@ -52,7 +54,7 @@ function generateUniquePlaylist(data) {
 
 // Charger le lecteur YouTube pour le morceau actuel
 function loadHiddenYoutubePlayer(videoId) {
-    if (player) player.destroy();  // Supprime le lecteur précédent
+    if (player) player.destroy();
     player = new YT.Player("hidden-youtube-player", {
         height: "0",
         width: "0",
@@ -86,15 +88,16 @@ function loadHiddenYoutubePlayer(videoId) {
 function loadRandomSong() {
     const song = currentPlaylist[roundCounter];
     loadHiddenYoutubePlayer(song.videoId);
+    roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
 }
 
 // Afficher le résultat de la manche et le score total
 function displayResult(distance) {
-    resultDisplay.innerText = `Round score : ${distance.toFixed(2)} km`;
+    resultDisplay.innerText = `Score de la manche : ${distance.toFixed(2)} km`;
     scores.push(distance);
 
     const totalScore = scores.reduce((acc, curr) => acc + curr, 0);
-    totalScoreDisplay.innerText = `Total score : ${totalScore.toFixed(2)} km`;
+    totalScoreDisplay.innerText = `Score total : ${totalScore.toFixed(2)} km`;
 
     // Tracer une ligne entre le marqueur et le lieu d'origine du morceau
     resultLine = new google.maps.Polyline({
@@ -110,21 +113,13 @@ function displayResult(distance) {
     });
 
     roundCounter++;
-    if (roundCounter < maxRounds) {
-        actionBtn.innerText = "Morceau suivant";
-        actionBtn.onclick = startNewRound;
-    } else {
-        if (player) player.stopVideo();
-        totalScoreDisplay.innerHTML = `<strong style="color: red;">Score total : ${totalScore.toFixed(2)} km</strong>`;
-        actionBtn.innerText = "RESTART";
-        actionBtn.onclick = resetGame;
-    }
+    guessBtn.style.display = "none"; // Masquer le bouton "Guess"
+    nextBtn.style.display = "block"; // Afficher le bouton "Next Track"
 }
 
 // Placer un marqueur sur la carte
 function placeMarker(location) {
     if (userMarker) userMarker.setMap(null);
-
     userMarker = new google.maps.Marker({
         position: location,
         map: map
@@ -151,12 +146,9 @@ function startNewRound() {
     if (resultLine) resultLine.setMap(null);
     if (userMarker) userMarker.setMap(null);
 
-    // Met à jour l'information de la manche pour afficher la progression
-    roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
-
     loadRandomSong();
-    actionBtn.innerText = "GUESS";
-    actionBtn.onclick = validateMarker;
+    guessBtn.style.display = "block";  // Afficher le bouton "Guess"
+    nextBtn.style.display = "none";    // Masquer le bouton "Next Track"
 }
 
 // Réinitialiser le jeu après les 5 manches
@@ -168,13 +160,13 @@ function resetGame() {
     totalScoreDisplay.innerText = "Score total : 0 km";
     totalScoreDisplay.style.fontWeight = "normal";
     totalScoreDisplay.style.color = "black";
-    roundInfo.innerText = `Round : ${roundCounter + 1}/${maxRounds}`;
+    roundInfo.innerText = `Manche : ${roundCounter + 1}/${maxRounds}`;
 
     fetch("data/songs.json")
         .then((response) => response.json())
         .then((data) => {
             currentPlaylist = generateUniquePlaylist(data);
-            console.log("New playlist :", currentPlaylist);  // Debug
+            console.log("Nouvelle playlist :", currentPlaylist);  // Debug
             startNewRound();
         });
 }
@@ -190,11 +182,12 @@ Promise.all([
         .then((response) => response.json())
         .then((data) => {
             currentPlaylist = generateUniquePlaylist(data);
-            console.log("First Playlist :", currentPlaylist);  // Debug
+            console.log("Playlist initiale :", currentPlaylist);  // Debug
             loadRandomSong();
         });
 })
 .catch((error) => console.error("Erreur de chargement des API :", error));
 
-// Lien du bouton d'action à la fonction de validation
-actionBtn.onclick = validateMarker;
+// Liaison des boutons à leurs fonctions
+guessBtn.onclick = validateMarker;
+nextBtn.onclick = startNewRound;
